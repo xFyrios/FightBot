@@ -9,7 +9,7 @@ http://inamidst.com/phenny/
 
 import sys, os, re, threading, imp
 import irc, requests, json
-from casino import *
+from fight import *
 
 home = os.getcwd()
 

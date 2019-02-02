@@ -65,12 +65,10 @@ def startup(phenny, input):
 	if hasattr(phenny.config, 'operuser'):
 		phenny.write(('OPER', phenny.config.operuser, phenny.config.operpass))
 	
-	# Get list of channels from the API
-	i = phenny.callGazelleApi({'username': phenny.config.nick, 'action': 'userInfo'})
 	# Join the channels on our account
-	channels = i['channels'].split(',')
+	channels = phenny.config.channels
 	for c in channels:
-		phenny.write(('SAJOIN', phenny.config.nick + ' #' + c))
+		phenny.write(('JOIN', '#' + c))
 		time.sleep(0.5)
 startup.rule = r'(.*)'
 startup.event = '251'

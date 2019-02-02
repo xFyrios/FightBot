@@ -1,9 +1,5 @@
 Installation &c.
 
-Dependencies:
-Download https://github.com/worldveil/deuces
-Run pip install -e downloaded location
-
 1) Run ./phenny - this creates a default config file
 2) Edit ~/.config/default.py
 3) Run ./phenny - this now runs phenny with your settings
@@ -11,7 +7,8 @@ Run pip install -e downloaded location
 Enjoy!
 
 -- 
-To add new casino modules, place the main supporting module in casino/. 
-This will have the games main functionality and tie into the cards and player modules.
-Next place a second module for the game in modules/gazelle/ that contains the IRC commands
-and link it back to the main game module in casino/.
+To add new functionality, create new modules in fight/ or edit the existing ones. 
+This will provide functionality and can tie into the player and monster modules.
+If you are creating a new game (ie. player vs player), place a second module in modules/gazelle/
+that contains the IRC commands. You can then import the functionality you need from the fight/ folder.
+

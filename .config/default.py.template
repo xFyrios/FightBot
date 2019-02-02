@@ -1,12 +1,12 @@
 # Main settings
-nick = 'CasinoBot'
-name = 'CasinoBot'
+nick = 'FightBot'
+name = 'FightBot'
 host = '69.69.69.69'
 port = 6667
 
 # Reconnect delay
 delay = 120
-channels = ['#Casino']
+channels = ['#AdventureClub']
 owner = 'GGn-developer'
 
 # password is the NickServ password, serverpass is the server password
@@ -40,10 +40,5 @@ prefix = '!'
 gazelle_url    = 'gazellegames.net'
 gazelle_apiurl = 'https://' + gazelle_url + '/ircapi.php'
 gazelle_apikey = ''
-
-# Announce Config
-announce_path = '/var/run/semag/semag.sock'
-announce_port = 51010
-announce_host = "127.0.0.1"
 
 # EOF
