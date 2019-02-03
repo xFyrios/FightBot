@@ -6,7 +6,7 @@ port = 6667
 
 # Reconnect delay
 delay = 120
-channels = ['#AdventureClub']
+channels = ['AdventureClub']
 owner = 'GGn-developer'
 
 # password is the NickServ password, serverpass is the server password
