@@ -181,10 +181,10 @@ class Player:
 				strong_weak = self.element_strong_weak(attack.element_type, monster.element_type)
 				if strong_weak and strong_weak == 'strong':
 					damage *= 2
-					phenny.say("%s It was not very effective." % self.announce_prepend())
+					phenny.say("%s It was super effective!" % self.announce_prepend())
 				elif strong_weak and strong_weak == 'weak':
 					damage = floor(damage / 2)
-					phenny.say("%s It was super effective!" % self.announce_prepend())
+					phenny.say("%s It was not very effective." % self.announce_prepend())
 			# Damage randomizer
 			random_int = (float(randint(85,100)) / 100)
 			damage = floor(damage * random_int)
