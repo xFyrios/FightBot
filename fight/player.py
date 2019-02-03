@@ -7,7 +7,7 @@ from math import floor
 # This object is used to setup a player for a fight. It is destroyed after the fight.
 class Player:
 	def __init__(self, uid, name, stats):
-		self.uid = uid
+		self.uid = int(uid)
 		self.name = name # IRC nick
 		self.site_username = stats['username']
 		self.element_type = int(stats['element_type'])

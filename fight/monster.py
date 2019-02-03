@@ -7,7 +7,7 @@ from math import floor
 # This object is used to setup a monster for a fight. It is destroyed after the fight.
 class Monster:
 	def __init__(self, monsterid, stats):
-		self.id = monsterid
+		self.id = int(monsterid)
 		self.name = stats['name']
 		self.description = stats['description']
 		self.element_type = int(stats['element_type'])
