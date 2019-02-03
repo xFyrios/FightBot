@@ -129,6 +129,7 @@ def explore(phenny, input):
 
 			phenny.say(player.display_level())
 			phenny.say(player.display_health())
+			phenny.say(monster.display_health())
 			phenny.write(('NOTICE', username + " Type !mstats for the monsters full stats or !pstats for your full stats."))
 			if monster.fast and randint(1, 10) <= 8: # 80% chance of suprise attack for 'fast' creatures
 				phenny.say("%s The %s surprises you with an attack!" % (monster.announce_prepend(), monster.name))
