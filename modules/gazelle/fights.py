@@ -115,6 +115,8 @@ def explore(phenny, input):
 			# Create the player and monster objects, add them to the ongoing_fights dictionary
 			print 'New Fight!'
 			player = p.create_player(phenny, userid, username)
+			if not player:
+				return False
 			print u'%s' % player
 			monster = m.create_monster(phenny, monster_id, username)
 			monster.announce(phenny)
@@ -313,12 +315,7 @@ def do_player_attack(phenny, attackid, userid, username):
 	if attack_hit(attack, userid, 'monster'):
 		cur_round = ongoing_fights[userid]['data']['round']
 		player.attack_monster(phenny, cur_round, attack, monster)
-		etx = '\x02'
-		if player.health <= 0:
-			phenny.say("%sYou died! You lost the battle!." % etx)
-			end_fight(phenny, userid)
-		elif monster.health <= 0:
-			phenny.say("%sThe %s died! You win the battle!" % (etx, monster.name))
+		if player.health <= 0 or monster.health <= 0:
 			end_fight(phenny, userid)
 	else:
 		phenny.say("%s %s's attack missed!" % (player.announce_prepend(), player.site_username))
@@ -332,12 +329,7 @@ def do_monster_attack(phenny, attack, userid):
 	if attack_hit(attack, userid, 'player'):
 		cur_round = ongoing_fights[userid]['data']['round']
 		monster.attack_player(phenny, cur_round, attack, player)
-		etx = '\x02'
-		if player.health <= 0:
-			phenny.say("%sYou died! You lost the battle!." % etx)
-			end_fight(phenny, userid)
-		elif monster.health <= 0:
-			phenny.say("%sThe %s died! You win the battle!" % (etx, monster.name))
+		if player.health <= 0 or monster.health <= 0:
 			end_fight(phenny, userid)
 	else:
 		phenny.say("%s The %s's attack missed!" % (monster.announce_prepend(), monster.name))
@@ -388,6 +380,14 @@ def end_fight(phenny, userid):
 	if in_fight_quiet(userid):
 		player = ongoing_fights[userid]['player']
 		monster = ongoing_fights[userid]['monster']
+		etx = '\x02'
+		if player.health <= 0 and monster.health <= 0:
+			phenny.say("%sBoth you and the %s died! The battle is a draw." % (etx, monster.name))
+		elif player.health <= 0:
+			phenny.say("%sYou died! You lost the battle!." % etx)
+		elif monster.health <= 0:
+			phenny.say("%sThe %s died! You win the battle!" % (etx, monster.name))
+
 		if player.health > 0 and monster.health <= 0: # if player won
 			experience = player.calculate_experience_gain(monster)
 			new_level = floor((player.experience + experience) ** (1. / 3))

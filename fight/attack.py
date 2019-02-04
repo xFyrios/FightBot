@@ -11,6 +11,8 @@ class Attack:
 		self.element_type = int(stats['element_type'])
 		self.element_type_name = stats['element_type_name']
 		self.damage_base = int(stats['damage_base'])
+		self.damage_to_self = int(stats['damage_to_self'])
+		self.damage_to_self_percent = float(stats['damage_to_self_percent'])
 		self.accuracy = int(stats['accuracy'])
 		self.priority = int(stats['priority'])
 		self.high_critical_chance = bool(stats['high_critical_chance'])
@@ -128,8 +130,75 @@ def create_attack(phenny, attackid, username):
 		phenny.write(('NOTICE', "%s Error: One of your attacks could not load properly. (Attack ID: %d)" % (username, attackid))) 
 		return False
 	else:
+		if 'damage_to_self_percent' not in stats:
+			stats['damage_to_self_percent'] = 0
 		new_attack = Attack(stats)
 		return new_attack
+
+# an attack you receive if you no longer have any attacks with uses left
+def create_last_resort_attack():
+	stats = {
+		"id": 100000,
+		"name": "Struggle",
+		"type": "Physical - Brute",
+		"element_type": 0,
+		"element_type_name": "",
+		"damage_base": 50,
+		"accuracy": 99,
+		"priority": 100,
+		"high_critical_chance": False,
+		"critical_multiplier": 1.5,
+		"health": 0,
+		"damage_to_self": 0,
+		"damage_to_self_percent": 0.25,
+		"max_uses": 10,
+		"realm_requirement": 0,
+		"realm_requirement_name": "",
+		"buffs": {
+			"attack": 0,
+			"defense": 0,
+			"strength": 0,
+			"accuracy": 0,
+			"speed": 0,
+			"turns": 1
+		},
+		"debuffs": {
+			"attack": 0,
+			"defense": 0,
+			"strength": 0,
+			"accuracy": 0,
+			"speed": 0,
+			"turns": 1
+		},
+		"buffs_by_stage": {
+			"attack": 0,
+			"defense": 0,
+			"strength": 0,
+			"accuracy": 0,
+			"speed": 0
+		},
+		"debuffs_by_stage": {
+			"attack": 0,
+			"defense": 0,
+			"strength": 0,
+			"accuracy": 0,
+			"speed": 0
+		},
+		"effects": {
+			"Sleep": 0,
+			"Poison": 0,
+			"Burn": 0,
+			"Freezing": 0,
+			"HPLeech": 0,
+			"Confusion": 0,
+			"Flinching": 0,
+			"Blindness": 0,
+			"CantEscape": 0,
+			"Embargo": 0
+		}
+	}
+	new_attack = Attack(stats)
+	return new_attack
 
 
 if __name__ == '__main__':

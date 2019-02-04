@@ -166,6 +166,9 @@ class Monster:
 		options = filter(lambda attack: attack.uses < attack.max_uses, self.attacks)
 		if self.can_run and randint(1,10) == 1: # 10% chance of running
 			return 'run'
+		if len(options) <= 0:
+			self.attacks.append(a.create_last_resort_attack())
+			options = filter(lambda attack: attack.uses < attack.max_uses, self.attacks)
 		return choice(options)
 
 	def run(self, player):
@@ -222,6 +225,13 @@ class Monster:
 				no_damage = True
 		else:
 			no_damage = True
+		if attack.damage_to_self_percent > 0:
+			damage_self = floor(self.max_health * attack.damage_to_self_percent)
+			self.health -= damage_self
+			if self.health < 0:
+				self.health = 0
+			phenny.say('%s The %s was hit with %d recoil damage!' % (self.announce_prepend(), self.name, damage_self))
+			phenny.say(self.display_health())
 		if player.health > 0:
 			buffs_applied = self.apply_attack_buffs(phenny, cur_round, attack, player)
 			effects_applied = self.apply_attack_effects(phenny, cur_round, attack.effects, player)

@@ -130,6 +130,9 @@ class Player:
 		return "%s03-%s" % (etx, etx)
 
 	def attack_options(self, phenny, username):
+		options = filter(lambda attack: attack.uses < attack.max_uses, self.attacks)
+		if len(options) <= 0:
+			self.attacks.append(a.create_last_resort_attack())
 		phenny.write(('NOTICE', username + " Choose your move:"))
 		i = 0
 		for attackid in range(len(self.attacks)):
@@ -198,6 +201,13 @@ class Player:
 				no_damage = True
 		else:
 			no_damage = True
+		if attack.damage_to_self_percent > 0:
+			damage_self = floor(self.max_health * attack.damage_to_self_percent)
+			self.health -= damage_self
+			if self.health < 0:
+				self.health = 0
+			phenny.say('%s You were hit with %d recoil damage!' % (self.announce_prepend(), damage_self))
+			phenny.say(self.display_health())
 		if monster.health > 0:
 			buffs_applied = self.apply_attack_buffs(phenny, cur_round, attack, monster)
 			effects_applied = self.apply_attack_effects(phenny, cur_round, attack.effects, monster)
@@ -481,9 +491,13 @@ def create_player(phenny, uid, username):
 
 def get_user_stats(phenny, uid, username):
 	stats = {}
+	print uid
 	site = phenny.callGazelleApi({'uid': uid, 'action': 'fightUserStats'})
 
-	if site == False or site['status'] == "error":
+	if site == False:
+		phenny.write(('NOTICE', username + " An error occurred trying to get your user stats."))
+		return False
+	elif site['status'] == "error":
 		error_msg = site['error']
 		phenny.write(('NOTICE', username + " Error: " + error_msg)) 
 		return False
