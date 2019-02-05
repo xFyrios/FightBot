@@ -221,6 +221,10 @@ class Player:
 			buffs_applied = self.apply_attack_buffs(phenny, cur_round, attack, monster)
 			effects_applied = self.apply_attack_effects(phenny, cur_round, attack.effects, monster)
 
+		if attack.element_type == 3 and 'Freezing' in monster.effects:
+			phenny.say('%s The %s was thawed out by the hot attack!' % (self.announce_prepend(), monster.name))
+			del monster.effects['Freezing']
+
 		if no_damage and not buffs_applied and not effects_applied and not restored_health:
 			phenny.say('%s No damage was done to the %s.' % (self.announce_prepend(), monster.name))
 

@@ -270,7 +270,7 @@ def do_round_moves(phenny, input, player_attack):
 		#TODO: After both attacks, apply status effects. Check hp of each creature afterwards to see if dead.
 		if in_fight_quiet(input.uid):
 			do_effects(phenny, input.uid)
-			
+
 		if in_fight_quiet(input.uid):
 			phenny.say(player.display_health())
 			phenny.say(monster.display_health())
@@ -356,6 +356,15 @@ def do_monster_sleep(phenny, userid):
 def do_player_attack(phenny, attackid, userid, username):
 	player = ongoing_fights[userid]['player']
 	monster = ongoing_fights[userid]['monster']
+
+	if 'Freezing' in player.effects:
+		if randint(1,5) != 1:
+			phenny.say("%s %s is frozen solid and cannot attack!" % (player.announce_prepend(), player.site_username))
+			return False
+		else:
+			phenny.say("%s %s is frozen solid... but breaks free!" % (player.announce_prepend(), player.site_username))
+			del player.effects['Freezing']
+
 	attack = player.attacks[attackid]
 	phenny.say("%s %s used %s." % (player.announce_prepend(), player.site_username, attack.name))
 	attack.uses += 1
@@ -371,6 +380,15 @@ def do_player_attack(phenny, attackid, userid, username):
 def do_monster_attack(phenny, attack, userid):
 	player = ongoing_fights[userid]['player']
 	monster = ongoing_fights[userid]['monster']
+
+	if 'Freezing' in monster.effects:
+		if randint(1,5) != 1:
+			phenny.say("%s The %s is frozen solid and cannot attack!" % (monster.announce_prepend(), monster.name))
+			return False
+		else:
+			phenny.say("%s The %s is frozen solid... but breaks free!" % (monster.announce_prepend(), monster.name))
+			del monster.effects['Freezing']
+
 	phenny.say("%s The %s used %s." % (monster.announce_prepend(), monster.name, attack.name))
 	attack.uses += 1
 

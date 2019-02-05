@@ -234,6 +234,10 @@ class Monster:
 			buffs_applied = self.apply_attack_buffs(phenny, cur_round, attack, player)
 			effects_applied = self.apply_attack_effects(phenny, cur_round, attack.effects, player)
 
+		if attack.element_type == 3 and 'Freezing' in player.effects:
+			phenny.say('%s You were thawed out by the hot attack!' % (self.announce_prepend(), player.site_username))
+			del player.effects['Freezing']
+
 		if no_damage and not buffs_applied and not effects_applied and not restored_health:
 			phenny.say('%s No damage was done to you.' % self.announce_prepend(), )
 
@@ -510,7 +514,7 @@ def get_monster_stats(phenny, monsterid, username):
 	site = phenny.callGazelleApi({'monsterid': monsterid, 'action': 'fightMonster'})
 
 	if site == False:
-		phenny.write(('NOTICE', username + " An error occurred trying to get your user stats."))
+		phenny.write(('NOTICE', username + " An error occurred trying to get the monsters stats."))
 		return False
 	elif site['status'] == "error":
 		error_msg = site['error']
