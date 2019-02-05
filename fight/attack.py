@@ -141,8 +141,8 @@ class Attack:
 	def is_weak_against(self, target_element):
 		"""Test if an attacks element is weak against target element"""
 		# Water > Fire > Earth > Wind > Water
-        if self.element_type == 0 or target_element == 0:
-            return False
+		if self.element_type == 0 or target_element == 0:
+			return False
 		if (self.element_type, target_element) in (
 				(ELEM_WATER, ELEM_WIND),
 				(ELEM_FIRE, ELEM_WATER),
