@@ -179,7 +179,7 @@ class Monster:
 		test = (((self.stats['speed'] * 128) / player_speed) + 30 * self.run_attempts) % 256
 		random_int = randint(0, 255)
 
-		return random_int < test:
+		return random_int < test
 
 	def attack_player(self, phenny, cur_round, attack, player):
 		restored_health = False
@@ -478,11 +478,11 @@ def get_monster_stats(phenny, monsterid, username):
 		phenny.write(('NOTICE', username + " Error: " + site['error']))
 		return False
 
-	stats = dict((key, site[k]) for key in (
+	stats = dict((key, site[key]) for key in (
 		'name', 'description', 'element_type',
 		'element_type_name', 'fast', 'health',
 		'experience', 'level_start', 'level_end',
-		'attack', 'defense', 'strength', 'accuracy''accuracy',
+		'attack', 'defense', 'strength', 'accuracy',
 		'speed', 'loss_level', 'rewards', 'can_run'))
 
 	if len(site['attacks']) > 4:

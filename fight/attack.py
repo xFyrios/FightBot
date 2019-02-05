@@ -121,7 +121,7 @@ class Attack:
 		threshold = strength
 		if self.high_critical_chance:
 			threshold *= 6
-		return randint(0, 30) < threshold:
+		return randint(0, 30) < threshold
 
 	def is_strong_against(self, target_element):
 		"""Test if an attacks element is strong against target element"""

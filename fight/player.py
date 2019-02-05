@@ -166,7 +166,7 @@ class Player:
 		test = (((self.stats['speed'] * 128) / monster_speed) + 30 * self.run_attempts) % 256
 		random_int = randint(0, 255)
 
-		return random_int < test:
+		return random_int < test
 
 	def attack_monster(self, phenny, cur_round, attack, monster):
 		restored_health = False
@@ -278,7 +278,7 @@ class Player:
 			self.recalculate_stats()
 		if change_monster:
 			monster.recalculate_stats()
-		return change_self or change_monster:
+		return change_self or change_monster
 
 	def apply_attack_effects(self, phenny, cur_round, effects, target):
 		major_effects = ['Poison', 'Burn', 'Sleep', 'Freezing']
@@ -325,7 +325,7 @@ class Player:
 						target.effects[effect] = end
 						change_target = True
 						self.announce_effect(phenny, effect, target.name)
-		return change_self or change_target:
+		return change_self or change_target
 
 	def announce_effect(self, phenny, effect, target_name = False):
 		announce_word = {'Poison': 'poisoned', 'Burn': 'burned', 'Freezing': 'frozen', 'Blindness': 'blinded', 'Confusion': 'confused'}
