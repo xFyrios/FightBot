@@ -220,7 +220,6 @@ class Monster:
 				if player.health < 0:
 					player.health = 0
 				phenny.say('%s %d damage was done to you!' % (self.announce_prepend(), damage))
-				phenny.say(player.display_health())
 			else:
 				no_damage = True
 		else:
@@ -231,7 +230,6 @@ class Monster:
 			if self.health < 0:
 				self.health = 0
 			phenny.say('%s The %s was hit with %d recoil damage!' % (self.announce_prepend(), self.name, damage_self))
-			phenny.say(self.display_health())
 		if player.health > 0:
 			buffs_applied = self.apply_attack_buffs(phenny, cur_round, attack, player)
 			effects_applied = self.apply_attack_effects(phenny, cur_round, attack.effects, player)

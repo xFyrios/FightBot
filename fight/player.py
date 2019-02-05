@@ -16,6 +16,7 @@ class Player:
 		self.max_health = int(stats['max_health'])
 		self.experience = int(stats['experience'])
 		self.level = int(stats['level'])
+		self.ghost = False
 
 		self.stats_start = {
 			'attack': float(stats['attack']),
@@ -56,6 +57,12 @@ class Player:
 		self.undo_debuffs = {}
 		self.effects = {}
 
+		if self.health == 0:
+			self.max_health = 5
+			self.health = self.max_health
+			self.site_username = "Ghost " + self.site_username
+			self.ghost = True
+
 	def __str__(self):
 		string = "Explorer ID: %d  Name: %s" % (self.uid, self.name)
 		if self.name != self.site_username:
@@ -65,6 +72,8 @@ class Player:
 		string += "  Health: %s(%d/%d)  Level: %d  XP: %d  |  Attack: %.1f  Defense: %.1f  Strength: %.1f  Accuracy: %.1f  Speed: %.1f  |  Attack Count: %d" % (self.visual_health(False), self.health, self.max_health, self.level, self.experience, self.stats['attack'], self.stats['defense'], self.stats['strength'], self.stats['accuracy'], self.stats['speed'], len(self.attacks))
 		if self.effects:
 			string += " | Status Ailments: %s" % (", ".join(self.effects.keys()))
+		if self.ghost:
+			string += " | Ghost"
 		return string
 
 	def display_level(self):
@@ -87,6 +96,8 @@ class Player:
 		phenny.say(string)
 		if self.effects:
 			phenny.say("%s Status Ailments: %s" % (self.announce_prepend(), ", ".join(self.effects.keys())))
+		if self.ghost:
+			phenny.say("%s Ghost Status" % self.announce_prepend())
 
 	def visual_health(self, color_bar = True):
 		etx = '\x03'
@@ -196,7 +207,6 @@ class Player:
 				if monster.health < 0:
 					monster.health = 0
 				phenny.say('%s %d damage was done to the %s!' % (self.announce_prepend(), damage, monster.name))
-				phenny.say(monster.display_health())
 			else:
 				no_damage = True
 		else:
@@ -207,7 +217,6 @@ class Player:
 			if self.health < 0:
 				self.health = 0
 			phenny.say('%s You were hit with %d recoil damage!' % (self.announce_prepend(), damage_self))
-			phenny.say(self.display_health())
 		if monster.health > 0:
 			buffs_applied = self.apply_attack_buffs(phenny, cur_round, attack, monster)
 			effects_applied = self.apply_attack_effects(phenny, cur_round, attack.effects, monster)

@@ -117,6 +117,7 @@ def explore(phenny, input):
 			player = p.create_player(phenny, userid, username)
 			if not player:
 				return False
+			
 			print u'%s' % player
 			monster = m.create_monster(phenny, monster_id, username)
 			monster.announce(phenny)
@@ -132,6 +133,8 @@ def explore(phenny, input):
 			phenny.say(player.display_level())
 			phenny.say(player.display_health())
 			phenny.say(monster.display_health())
+			if player.ghost:
+				phenny.say("You appear to be dead and have spawned as a ghost!")
 			phenny.write(('NOTICE', username + " Type !mstats for the monsters full stats or !pstats for your full stats."))
 			if monster.fast and randint(1, 10) <= 8: # 80% chance of suprise attack for 'fast' creatures
 				phenny.say("%s The %s surprises you with an attack!" % (monster.announce_prepend(), monster.name))
@@ -266,6 +269,11 @@ def do_round_moves(phenny, input, player_attack):
 
 		#TODO: After both attacks, apply status effects. Check hp of each creature afterwards to see if dead.
 		if in_fight_quiet(input.uid):
+			do_effects(phenny, input.uid)
+			
+		if in_fight_quiet(input.uid):
+			phenny.say(player.display_health())
+			phenny.say(monster.display_health())
 			player.attack_options(phenny, input.nick)
 			player.can_attack = True
 
@@ -278,11 +286,11 @@ def do_player_first(phenny, input, players_choice, monsters_choice):
 	else:
 		do_player_attack(phenny, players_choice, input.uid, input.nick)
 
-	monster = ongoing_fights[input.uid]['monster']
-	if 'Sleep' in monster.effects:
-		monsters_choice = 'sleep'
-
 	if in_fight_quiet(input.uid):
+		monster = ongoing_fights[input.uid]['monster']
+		if 'Sleep' in monster.effects:
+			monsters_choice = 'sleep'
+
 		if monsters_choice == 'run':
 			do_monster_run(phenny, input.uid)
 		elif monsters_choice == 'sleep':
@@ -299,11 +307,11 @@ def do_monster_first(phenny, input, players_choice, monsters_choice):
 	else:
 		do_monster_attack(phenny, monsters_choice, input.uid)
 
-	player = ongoing_fights[input.uid]['player']
-	if 'Sleep' in player.effects:
-		players_choice = 'sleep'
-
 	if in_fight_quiet(input.uid):
+		player = ongoing_fights[input.uid]['player']
+		if 'Sleep' in player.effects:
+			players_choice = 'sleep'
+			
 		if players_choice == 'run':
 			do_player_run(phenny, input.uid, input.nick)
 		elif players_choice == 'sleep':
@@ -374,6 +382,33 @@ def do_monster_attack(phenny, attack, userid):
 	else:
 		phenny.say("%s The %s's attack missed!" % (monster.announce_prepend(), monster.name))
 
+# Apply status effects
+def do_effects(phenny, userid):
+	player = ongoing_fights[userid]['player']
+	monster = ongoing_fights[userid]['monster']
+
+	if in_fight_quiet(userid):
+		if 'Poison' in player.effects or 'Burn' in player.effects:
+			eighth_health = max(floor(player.max_health / 8), 1)
+			player.health -= eighth_health
+			if player.health < 0:
+				player.health = 0
+			if 'Poison' in player.effects:
+				phenny.say('%s You were hurt by poison! You took %d damage.' % (player.announce_prepend(), eighth_health))
+			else:
+				phenny.say('%s You were hurt by your burn! You took %d damage.' % (player.announce_prepend(), eighth_health))
+		if 'Poison' in monster.effects or 'Burn' in monster.effects:
+			eighth_health = max(floor(monster.max_health / 8), 1)
+			monster.health -= eighth_health
+			if monster.health < 0:
+				monster.health = 0
+			if 'Poison' in monster.effects:
+				phenny.say('%s The %s is hurt by poison! It took %d damage.' % (monster.announce_prepend(), monster.name, eighth_health))
+			else:
+				phenny.say('%s The %s is hurt by its burn! It took %d damage.' % (monster.announce_prepend(), monster.name, eighth_health))
+		if player.health <= 0 or monster.health <= 0:
+			end_fight(phenny, userid)
+
 
 ###################
 # BASIC FUNCTIONS #
@@ -436,7 +471,8 @@ def end_fight(phenny, userid):
 			phenny.callGazelleApi({'userid': userid, 'experience': experience, 'action': 'fightAddExperience'})
 			if new_level > player.level:
 				phenny.say("%sLevel up! You grew to level %d!" % (etx, new_level))
-		phenny.callGazelleApi({'userid': userid, 'health': player.health, 'action': 'fightSetHealth'})
+		if not player.ghost:
+			phenny.callGazelleApi({'userid': userid, 'health': player.health, 'action': 'fightSetHealth'})
 		phenny.say("The fight between %s and the %s has ended." % (player.site_username, monster.name))
 		phenny.say("==========================================")
 		current_realm.info(phenny)
