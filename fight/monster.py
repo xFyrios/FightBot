@@ -84,7 +84,7 @@ class Monster:
 
 	def announce(self, phenny):
 		etx = '\x02'
-		flavor = ['stumbled upon', 'found', 'encountered', 'ran into', 'bumped into', 'ran across', 'ran into', 'came upon', 'happened upon']
+		flavor = ('stumbled upon', 'found', 'encountered', 'ran into', 'bumped into', 'ran across', 'ran into', 'came upon', 'happened upon')
 		phenny.say("You %s a level %d %s%s%s!" % (choice(flavor), self.level, etx, self.name, etx))
 		phenny.say(self.description)
 
@@ -483,7 +483,7 @@ class Monster:
 # BASIC FUNCTIONS
 def create_monster(phenny, monsterid, username):
 	stats = get_monster_stats(phenny, monsterid, username)
-	if stats == False:
+	if not stats:
 		return False
 	else:
 		new_monster = Monster(monsterid, stats)
