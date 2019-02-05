@@ -424,6 +424,28 @@ def do_effects(phenny, userid):
 				phenny.say('%s The %s is hurt by poison! It took %d damage.' % (monster.announce_prepend(), monster.name, eighth_health))
 			else:
 				phenny.say('%s The %s is hurt by its burn! It took %d damage.' % (monster.announce_prepend(), monster.name, eighth_health))
+		
+		if 'HPLeech' in player.effects:
+			eighth_health = max(floor(player.max_health / 8), 1)
+			player.health -= eighth_health
+			if player.health < 0:
+				player.health = 0
+			if (monster.health + eighth_health) > monster.max_health:
+				monster.health = monster.max_health
+			else:
+				monster.health += eighth_health
+			phenny.say('%s Your health was sapped! The %s stole %d HP from you.' % (monster.announce_prepend(), monster.name, eighth_health))
+		if 'HPLeech' in monster.effects:
+			eighth_health = max(floor(monster.max_health / 8), 1)
+			monster.health -= eighth_health
+			if monster.health < 0:
+				monster.health = 0
+			if (player.health + eighth_health) > player.max_health:
+				player.health = player.max_health
+			else:
+				player.health += eighth_health
+			phenny.say('%s You sapped the %s\'s health! You stole %d HP from it.' % (player.announce_prepend(), monster.name, eighth_health))
+
 		if player.health <= 0 or monster.health <= 0:
 			end_fight(phenny, userid)
 
