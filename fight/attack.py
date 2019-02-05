@@ -151,7 +151,7 @@ class Attack:
 # BASIC FUNCTIONS
 def create_attack(phenny, attackid, username):
 	stats = phenny.callGazelleApi({'attackid': attackid, 'action': 'fightAttack'})
-	if not stats or 'status' no in stats or stats['status'] == "error":
+	if not stats or 'status' not in stats or stats['status'] == "error":
 		phenny.write(('NOTICE', "%s Error: One of your attacks could not load properly. (Attack ID: %d)" % (username, attackid)))
 		return False
 
