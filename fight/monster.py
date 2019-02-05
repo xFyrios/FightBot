@@ -465,33 +465,19 @@ class Monster:
 	# Returns 'strong', 'weak', or False if neither
 	@staticmethod
 	def element_strong_weak(attack_element, target_element):
-		# 1 => 'Earth', 2 => 'Wind', 3 => 'Fire', 4 => 'Water'
 		# Water > Fire > Earth > Wind > Water
-		if attack_element == 4: # Water
-			if target_element == 3: # > Fire
-				return 'strong'
-			elif target_element == 2: # < Wind
-				return 'weak'
-
-		elif attack_element == 3: # Fire
-			if target_element == 1: # > Earth
-				return 'strong'
-			elif target_element == 4: # < Water
-				return 'weak'
-
-		elif attack_element == 1: # Earth
-			if target_element == 2: # > Wind
-				return 'strong'
-			elif target_element == 3: # < Fire
-				return 'weak'
-
-		elif attack_element == 2: # Wind
-			if target_element == 4: # > Water
-				return 'strong'
-			elif target_element == 1: # < Earth
-				return 'weak'
-		else:
-			return False
+		pair = (attack_element, target_element)
+		if pair in ((a.ELEM_WATER, a.ELEM_FIRE),
+					(a.ELEM_FIRE, a.ELEM_EARTH),
+					(a.ELEM_EARTH, a.ELEM_WIND),
+					(a.ELEM_WIND, a.ELEM_WATER)):
+			return 'strong'
+		if pair in ((a.ELEM_WATER, a.ELEM_WIND),
+					(a.ELEM_FIRE, a.ELEM_WATER),
+					(a.ELEM_EARTH, a.ELEM_FIRE),
+					(a.ELEM_WIND, a.ELEM_EARTH)):
+			return 'weak'
+		return False
 
 
 # BASIC FUNCTIONS
@@ -519,14 +505,12 @@ def get_monster_stats(phenny, monsterid, username):
 		'experience', 'level_start', 'level_end',
 		'attack', 'defense', 'strength', 'accuracy''accuracy',
 		'speed', 'loss_level', 'rewards', 'can_run'))
-	stats['attacks'] = []
 
 	if len(site['attacks']) > 4:
 		attacks = sample(site['attacks'], 4)
 	else:
 		attacks = site['attacks']
-	for attackid in attacks:
-		stats['attacks'].append(a.create_attack(phenny, int(attackid), username))
+	stats['attacks'] = [a.create_attack(phenny, int(i), username) for i in attacks]
 
 	return stats
 
