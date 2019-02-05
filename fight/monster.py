@@ -72,7 +72,7 @@ class Monster:
 			string += ' [Fast!]'
 		if self.element_type > 0:
 			string += "  Element: %s" % self.element_type_name
-		
+
 		attack_count = len(self.attacks)
 		if self.can_run:
 			attack_count += 1
@@ -234,7 +234,7 @@ class Monster:
 			buffs_applied = self.apply_attack_buffs(phenny, cur_round, attack, player)
 			effects_applied = self.apply_attack_effects(phenny, cur_round, attack.effects, player)
 
-		if attack.element_type == 3 and 'Freezing' in player.effects:
+		if attack.element_type == a.ELEM_FIRE and 'Freezing' in player.effects:
 			phenny.say('%s You were thawed out by the hot attack!' % (self.announce_prepend(), player.site_username))
 			del player.effects['Freezing']
 
@@ -296,10 +296,7 @@ class Monster:
 			self.recalculate_stats()
 		if change_player:
 			player.recalculate_stats()
-		if change_self or change_player:
-			return True
-		else:
-			return False
+		return change_self or change_player
 
 	def apply_attack_effects(self, phenny, cur_round, effects, target):
 		major_effects = ['Poison', 'Burn', 'Sleep', 'Freezing']
@@ -313,7 +310,7 @@ class Monster:
 						# If that status effect is already applied, silently fail
 						continue
 					# Major effect, check to make sure the target doesn't already have one of these
-					intersect = [t_effect for t_effect in target.effects if t_effect in major_effects] 
+					intersect = [t_effect for t_effect in target.effects if t_effect in major_effects]
 					if len(intersect) > 0:
 						# Already has a major effect, deny
 						phenny.say("%s The %s tried to use %s but it failed." % (self.announce_prepend(), self.name, effect))
@@ -513,12 +510,12 @@ def get_monster_stats(phenny, monsterid, username):
 	stats = {}
 	site = phenny.callGazelleApi({'monsterid': monsterid, 'action': 'fightMonster'})
 
-	if site == False:
+	if not site or 'status' not in site:
 		phenny.write(('NOTICE', username + " An error occurred trying to get the monsters stats."))
 		return False
 	elif site['status'] == "error":
 		error_msg = site['error']
-		phenny.write(('NOTICE', username + " Error: " + error_msg)) 
+		phenny.write(('NOTICE', username + " Error: " + error_msg))
 		return False
 	else:
 		stats['name'] = site['name']

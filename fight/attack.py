@@ -2,6 +2,11 @@
 
 from random import randint
 
+ELEM_EARTH = 1
+ELEM_WIND = 2
+ELEM_FIRE = 3
+ELEM_WATER = 4
+
 # This object is used to setup attacks both for players and monsters
 class Attack:
 	def __init__(self, stats):
@@ -58,7 +63,7 @@ class Attack:
 
 		has_buffs_by_stage = False
 		has_debuffs_by_stage = False
-		string += " | " 
+		string += " | "
 		for buff_name, buff in self.buffs_by_stage.items():
 			if buff != 0:
 				sign = '+' if buff > 0 else ''
@@ -75,7 +80,7 @@ class Attack:
 		else:
 			string += "No Debuffs (by stage) "
 		string += "| "
-		
+
 		has_buffs = False
 		has_debuffs = False
 		for buff_name, buff in self.buffs.items():
@@ -127,7 +132,7 @@ def create_attack(phenny, attackid, username):
 	stats = phenny.callGazelleApi({'attackid': attackid, 'action': 'fightAttack'})
 
 	if stats == False or stats['status'] == "error":
-		phenny.write(('NOTICE', "%s Error: One of your attacks could not load properly. (Attack ID: %d)" % (username, attackid))) 
+		phenny.write(('NOTICE', "%s Error: One of your attacks could not load properly. (Attack ID: %d)" % (username, attackid)))
 		return False
 	else:
 		if 'damage_to_self_percent' not in stats:
