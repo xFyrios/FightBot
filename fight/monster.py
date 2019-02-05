@@ -164,7 +164,7 @@ class Monster:
 	# Attack functions
 	def choose_attack(self):
 		options = filter(lambda attack: attack.uses < attack.max_uses, self.attacks)
-		if self.can_run and randint(1,10) == 1: # 10% chance of running
+		if self.can_run and 'CantEscape' not in self.effects and randint(1,10) == 1: # 10% chance of running
 			return 'run'
 		if len(options) <= 0:
 			self.attacks.append(a.create_last_resort_attack())

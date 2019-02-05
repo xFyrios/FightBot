@@ -154,7 +154,8 @@ class Player:
 			else:
 				string = " %d - %s [!attack %d]" % (i, attack.display_attack_option(), i)
 			phenny.write(('NOTICE', username + string))
-		phenny.write(('NOTICE', username + " %d - Run [!run]" % (i+1)))
+		if 'CantEscape' not in self.effects:
+			phenny.write(('NOTICE', username + " %d - Run [!run]" % (i+1)))
 
 
 	# Run and Attack functions

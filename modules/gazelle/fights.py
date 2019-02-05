@@ -324,6 +324,11 @@ def do_player_run(phenny, userid, username):
 	if in_fight_quiet(userid):
 		player = ongoing_fights[userid]['player']
 		monster = ongoing_fights[userid]['monster']
+
+		if 'CantEscape' in player.effects:
+			phenny.say("%s You were blocked and cannot run!" % player.announce_prepend())
+			return False
+
 		success = player.run(monster)
 		if success:
 			phenny.say("%s %s ran from the %s!" % (player.announce_prepend(), player.site_username, monster.name))
