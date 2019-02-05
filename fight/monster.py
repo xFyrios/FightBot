@@ -202,7 +202,7 @@ class Monster:
 				phenny.say("%s It was a critical hit!" % self.announce_prepend())
 			# Element strengths/weaknesses
 			if attack.element_type > 0 and player.element_type > 0:
-				strong_weak = self.element_strong_weak(attack.element_type, player.element_type)
+				strong_weak = a.element_strong_weak(attack.element_type, player.element_type)
 				if strong_weak and strong_weak == 'strong':
 					damage *= 2
 					phenny.say("%s It was super effective!" % self.announce_prepend())
@@ -459,25 +459,6 @@ class Monster:
 
 		multiplier = multipliers[stage]
 		return float(stat) * multiplier
-
-
-	# Test if an attacks element is strong or weak against a targets element
-	# Returns 'strong', 'weak', or False if neither
-	@staticmethod
-	def element_strong_weak(attack_element, target_element):
-		# Water > Fire > Earth > Wind > Water
-		pair = (attack_element, target_element)
-		if pair in ((a.ELEM_WATER, a.ELEM_FIRE),
-					(a.ELEM_FIRE, a.ELEM_EARTH),
-					(a.ELEM_EARTH, a.ELEM_WIND),
-					(a.ELEM_WIND, a.ELEM_WATER)):
-			return 'strong'
-		if pair in ((a.ELEM_WATER, a.ELEM_WIND),
-					(a.ELEM_FIRE, a.ELEM_WATER),
-					(a.ELEM_EARTH, a.ELEM_FIRE),
-					(a.ELEM_WIND, a.ELEM_EARTH)):
-			return 'weak'
-		return False
 
 
 # BASIC FUNCTIONS

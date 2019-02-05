@@ -189,7 +189,7 @@ class Player:
 				phenny.say("%s It was a critical hit!" % self.announce_prepend())
 			# Element strengths/weaknesses
 			if attack.element_type > 0 and monster.element_type > 0:
-				strong_weak = self.element_strong_weak(attack.element_type, monster.element_type)
+				strong_weak = a.element_strong_weak(attack.element_type, monster.element_type)
 				if strong_weak and strong_weak == 'strong':
 					damage *= 2
 					phenny.say("%s It was super effective!" % self.announce_prepend())
@@ -443,39 +443,6 @@ class Player:
 
 		multiplier = multipliers[stage]
 		return float(stat) * multiplier
-
-
-	# Test if an attacks element is strong or weak against a targets element
-	# Returns 'strong', 'weak', or False if neither
-	@staticmethod
-	def element_strong_weak(attack_element, target_element):
-		# 1 => 'Earth', 2 => 'Wind', 3 => 'Fire', 4 => 'Water'
-		# Water > Fire > Earth > Wind > Water
-		if attack_element == 4: # Water
-			if target_element == 3: # > Fire
-				return 'strong'
-			elif target_element == 2: # < Wind
-				return 'weak'
-
-		elif attack_element == 3: # Fire
-			if target_element == 1: # > Earth
-				return 'strong'
-			elif target_element == 4: # < Water
-				return 'weak'
-
-		elif attack_element == 1: # Earth
-			if target_element == 2: # > Wind
-				return 'strong'
-			elif target_element == 3: # < Fire
-				return 'weak'
-
-		elif attack_element == 2: # Wind
-			if target_element == 4: # > Water
-				return 'strong'
-			elif target_element == 1: # < Earth
-				return 'weak'
-		else:
-			return False
 
 	def calculate_experience_gain(self, monster):
 		base = (monster.experience * monster.level) / 5
