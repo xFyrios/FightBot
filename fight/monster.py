@@ -201,13 +201,12 @@ class Monster:
 				damage = floor(damage * attack.critical_multiplier)
 				phenny.say("%s It was a critical hit!" % self.announce_prepend())
 			# Element strengths/weaknesses
-			if attack.element_type > 0 and player.element_type > 0:
-				if attack.is_strong_against(player.element_type):
-					damage *= 2
-					phenny.say("%s It was super effective!" % self.announce_prepend())
-				elif attack.is_weak_against(player.element_type):
-					damage = floor(damage / 2)
-					phenny.say("%s It was not very effective." % self.announce_prepend())
+			if attack.is_strong_against(player.element_type):
+				damage *= 2
+				phenny.say("%s It was super effective!" % self.announce_prepend())
+			elif attack.is_weak_against(player.element_type):
+				damage = floor(damage / 2)
+				phenny.say("%s It was not very effective." % self.announce_prepend())
 			# Damage randomizer
 			random_int = (float(randint(85,100)) / 100)
 			damage = floor(damage * random_int)
