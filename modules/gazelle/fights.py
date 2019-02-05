@@ -223,17 +223,31 @@ def do_round_moves(phenny, input, player_attack):
 		ongoing_fights[input.uid]['data']['round'] += 1
 		player = ongoing_fights[input.uid]['player']
 		monster = ongoing_fights[input.uid]['monster']
-		players_choice = player_attack
-		monsters_choice = monster.choose_attack()
-		players_attack_priority = get_attack_priority('run' if players_choice == 'run' else player.attacks[players_choice])
-		monsters_attack_priority = get_attack_priority(monsters_choice)
 
-		#Expire buffs and secondary effects
 		cur_round = ongoing_fights[input.uid]['data']['round']
-		player.expire_buffs(phenny, cur_round)
-		monster.expire_buffs(phenny, cur_round)
+		#Expire secondary effects
 		player.expire_effects(phenny, cur_round)
 		monster.expire_effects(phenny, cur_round)
+
+		if 'Sleep' in player.effects:
+			player_attack = 'sleep'
+		players_choice = player_attack
+		if 'Sleep' in monster.effects:
+			monsters_choice = 'sleep'
+		else:
+			monsters_choice = monster.choose_attack()
+
+		if players_choice == 'run':
+			players_attack_priority = get_attack_priority('run')
+		elif players_choice == 'sleep':
+			players_attack_priority = get_attack_priority('sleep')
+		else:
+			players_attack_priority = get_attack_priority(player.attacks[players_choice])
+		monsters_attack_priority = get_attack_priority(monsters_choice)
+
+		#Expire buffs
+		player.expire_buffs(phenny, cur_round)
+		monster.expire_buffs(phenny, cur_round)
 
 		if players_attack_priority > monsters_attack_priority:
 			do_player_first(phenny, input, players_choice, monsters_choice)
@@ -259,12 +273,20 @@ def do_round_moves(phenny, input, player_attack):
 def do_player_first(phenny, input, players_choice, monsters_choice):
 	if players_choice == 'run':
 		do_player_run(phenny, input.uid, input.nick)
+	elif players_choice == 'sleep':
+		do_player_sleep(phenny, input.uid)
 	else:
 		do_player_attack(phenny, players_choice, input.uid, input.nick)
+
+	monster = ongoing_fights[input.uid]['monster']
+	if 'Sleep' in monster.effects:
+		monsters_choice = 'sleep'
 
 	if in_fight_quiet(input.uid):
 		if monsters_choice == 'run':
 			do_monster_run(phenny, input.uid)
+		elif monsters_choice == 'sleep':
+			do_monster_sleep(phenny, input.uid)
 		else:
 			do_monster_attack(phenny, monsters_choice, input.uid)
 
@@ -272,12 +294,20 @@ def do_player_first(phenny, input, players_choice, monsters_choice):
 def do_monster_first(phenny, input, players_choice, monsters_choice):
 	if monsters_choice == 'run':
 		do_monster_run(phenny, input.uid)
+	elif monsters_choice == 'sleep':
+		do_monster_sleep(phenny, input.uid)
 	else:
 		do_monster_attack(phenny, monsters_choice, input.uid)
+
+	player = ongoing_fights[input.uid]['player']
+	if 'Sleep' in player.effects:
+		players_choice = 'sleep'
 
 	if in_fight_quiet(input.uid):
 		if players_choice == 'run':
 			do_player_run(phenny, input.uid, input.nick)
+		elif players_choice == 'sleep':
+			do_player_sleep(phenny, input.uid)
 		else:
 			do_player_attack(phenny, players_choice, input.uid, input.nick)
 
@@ -303,6 +333,16 @@ def do_monster_run(phenny, userid):
 			end_fight(phenny, userid)
 		else:
 			phenny.say("%s The %s attempted to run from you but failed!" % (monster.announce_prepend(), monster.name))
+
+def do_player_sleep(phenny, userid):
+	if in_fight_quiet(userid):
+		player = ongoing_fights[userid]['player']
+		phenny.say("%s %s is fast asleep and cannot attack. ZzzZZzzZZzz..." % (player.announce_prepend(), player.site_username))
+
+def do_monster_sleep(phenny, userid):
+	if in_fight_quiet(userid):
+		monster = ongoing_fights[userid]['monster']
+		phenny.say("%s The %s is fast asleep and cannot attack. ZzzZZzzZZzz..." % (monster.announce_prepend(), monster.name))
 
 # Execute an attack. Called by the do_round_moves function.
 def do_player_attack(phenny, attackid, userid, username):
@@ -431,6 +471,8 @@ def in_fight_quiet(userid):
 def get_attack_priority(attack):
 	if attack == 'run':
 		return 150
+	elif attack == 'sleep':
+		return 255
 	else:
 		return attack.priority
 

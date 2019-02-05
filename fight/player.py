@@ -283,11 +283,11 @@ class Player:
 		for effect,chance in effects.items():
 			if chance > 0 and randint(1, 100) < chance:
 				if effect in major_effects:
-					if effect in target.effects.keys():
+					if effect in target.effects:
 						# If that status effect is already applied, silently fail
 						continue
 					# Major effect, check to make sure the target doesn't already have one of these
-					intersect = [effect for effect in target.effects.keys() if effect in major_effects] 
+					intersect = [t_effect for t_effect in target.effects if t_effect in major_effects] 
 					if len(intersect) > 0:
 						# Already has a major effect, deny
 						phenny.say("%s You tried to use %s but it failed." % (self.announce_prepend(), effect))
@@ -303,7 +303,7 @@ class Player:
 							self.announce_effect(phenny, effect, target.name)
 				else:
 					# Minor effects
-					if effect in ['CantEscape', 'Embargo', 'HPLeech', 'Blindness', 'Confusion'] and effect in target.effects.keys():
+					if effect in ['CantEscape', 'Embargo', 'HPLeech', 'Blindness', 'Confusion'] and effect in target.effects:
 						# If that status effect is already applied, silently fail
 						continue
 					if effect in ['CantEscape', 'Embargo', 'HPLeech']:

@@ -307,11 +307,11 @@ class Monster:
 		for effect,chance in effects.items():
 			if chance > 0 and randint(1, 100) < chance:
 				if effect in major_effects:
-					if effect in target.effects.keys():
+					if effect in target.effects:
 						# If that status effect is already applied, silently fail
 						continue
 					# Major effect, check to make sure the target doesn't already have one of these
-					intersect = [effect for effect in target.effects.keys() if effect in major_effects] 
+					intersect = [t_effect for t_effect in target.effects if t_effect in major_effects] 
 					if len(intersect) > 0:
 						# Already has a major effect, deny
 						phenny.say("%s The %s tried to use %s but it failed." % (self.announce_prepend(), self.name, effect))
@@ -327,7 +327,7 @@ class Monster:
 							self.announce_effect(phenny, effect)
 				else:
 					# Minor effects
-					if effect in ['CantEscape', 'Embargo', 'HPLeech', 'Blindness', 'Confusion'] and effect in target.effects.keys():
+					if effect in ['CantEscape', 'Embargo', 'HPLeech', 'Blindness', 'Confusion'] and effect in target.effects:
 						# If that status effect is already applied, silently fail
 						continue
 					if effect in ['CantEscape', 'Embargo', 'HPLeech']:
