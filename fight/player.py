@@ -8,7 +8,7 @@ from math import floor
 class Player:
 	def __init__(self, uid, name, stats):
 		self.uid = int(uid)
-		self.name = name # IRC nick
+		self.name = name  # IRC nick
 		self.site_username = stats['username']
 		self.element_type = int(stats['element_type'])
 		self.element_type_name = stats['element_type_name']
@@ -47,7 +47,7 @@ class Player:
 			'speed': 0
 		}
 		self.stats_buff_expiry = {}
-		
+
 		self.attacks = stats['attacks']
 		self.items = []
 
@@ -166,10 +166,7 @@ class Player:
 		test = (((self.stats['speed'] * 128) / monster_speed) + 30 * self.run_attempts) % 256
 		random_int = randint(0, 255)
 
-		if random_int < test:
-			return True
-		else:
-			return False
+		return random_int < test:
 
 	def attack_monster(self, phenny, cur_round, attack, monster):
 		restored_health = False
@@ -283,10 +280,7 @@ class Player:
 			self.recalculate_stats()
 		if change_monster:
 			monster.recalculate_stats()
-		if change_self or change_monster:
-			return True
-		else:
-			return False
+		return change_self or change_monster:
 
 	def apply_attack_effects(self, phenny, cur_round, effects, target):
 		major_effects = ['Poison', 'Burn', 'Sleep', 'Freezing']
@@ -300,7 +294,7 @@ class Player:
 						# If that status effect is already applied, silently fail
 						continue
 					# Major effect, check to make sure the target doesn't already have one of these
-					intersect = [t_effect for t_effect in target.effects if t_effect in major_effects] 
+					intersect = [t_effect for t_effect in target.effects if t_effect in major_effects]
 					if len(intersect) > 0:
 						# Already has a major effect, deny
 						phenny.say("%s You tried to use %s but it failed." % (self.announce_prepend(), effect))
@@ -333,10 +327,7 @@ class Player:
 						target.effects[effect] = end
 						change_target = True
 						self.announce_effect(phenny, effect, target.name)
-		if change_self or change_target:
-			return True
-		else:
-			return False
+		return change_self or change_target:
 
 	def announce_effect(self, phenny, effect, target_name = False):
 		announce_word = {'Poison': 'poisoned', 'Burn': 'burned', 'Freezing': 'frozen', 'Blindness': 'blinded', 'Confusion': 'confused'}
@@ -398,11 +389,11 @@ class Player:
 		phenny.say("%s %s" % (self.announce_prepend(), string))
 
 	def expire_buffs(self, phenny, cur_round):
-		change = False
+		change = False  #FIXME: Unused
 		if self.stats_buff_expiry:
 			for exp_round, expire_dict in self.stats_buff_expiry.items():
 				if exp_round < cur_round:
-					change = True
+					change = True  #FIXME: Unused
 					for stat, buff in expire_dict.items():
 						self.stats_cur_buff[stat] -= buff
 						if buff > 0:
@@ -415,11 +406,11 @@ class Player:
 
 	def expire_effects(self, phenny, cur_round):
 		announce_word = {'Blindness': 'blinded', 'Confusion': 'confused'}
-		change = False
+		change = False  #FIXME: Unused
 		if self.effects:
 			for effect, exp_round in self.effects.items():
 				if exp_round > 0 and exp_round < cur_round:
-					change = True
+					change = True  #FIXME: Unused
 					del self.effects[effect]
 					if effect in announce_word:
 						phenny.say("%s You are no longer %s!" % (self.announce_prepend(), announce_word[effect]))
@@ -452,7 +443,7 @@ class Player:
 
 		multiplier = multipliers[stage]
 		return float(stat) * multiplier
-		
+
 
 	# Test if an attacks element is strong or weak against a targets element
 	# Returns 'strong', 'weak', or False if neither
@@ -512,7 +503,7 @@ def get_user_stats(phenny, uid, username):
 		return False
 	elif site['status'] == "error":
 		error_msg = site['error']
-		phenny.write(('NOTICE', username + " Error: " + error_msg)) 
+		phenny.write(('NOTICE', username + " Error: " + error_msg))
 		return False
 	else:
 		stats['username'] = site['username']
