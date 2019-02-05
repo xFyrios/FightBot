@@ -389,11 +389,11 @@ class Player:
 		phenny.say("%s %s" % (self.announce_prepend(), string))
 
 	def expire_buffs(self, phenny, cur_round):
-		change = False  #FIXME: Unused
+		change = False
 		if self.stats_buff_expiry:
 			for exp_round, expire_dict in self.stats_buff_expiry.items():
 				if exp_round < cur_round:
-					change = True  #FIXME: Unused
+					change = True
 					for stat, buff in expire_dict.items():
 						self.stats_cur_buff[stat] -= buff
 						if buff > 0:
