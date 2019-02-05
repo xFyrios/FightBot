@@ -229,22 +229,5 @@ def create_last_resort_attack():
 	new_attack = Attack(stats)
 	return new_attack
 
-def element_strong_weak(attack_element, target_element):
-	"""Test if an attacks element is strong or weak against a targets element
-	Returns 'strong', 'weak', or False if neither"""
-	# Water > Fire > Earth > Wind > Water
-	pair = (attack_element, target_element)
-	if pair in ((ELEM_WATER, ELEM_FIRE),
-				(ELEM_FIRE, ELEM_EARTH),
-				(ELEM_EARTH, ELEM_WIND),
-				(ELEM_WIND, ELEM_WATER)):
-		return 'strong'
-	if pair in ((ELEM_WATER, ELEM_WIND),
-				(ELEM_FIRE, ELEM_WATER),
-				(ELEM_EARTH, ELEM_FIRE),
-				(ELEM_WIND, ELEM_EARTH)):
-		return 'weak'
-	return False
-
 if __name__ == '__main__':
     print(__doc__)
