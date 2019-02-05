@@ -105,7 +105,7 @@ realm_unlock.example = '!realmunlock'
 def explore(phenny, input):
 	if not game_started:
 		phenny.say("There is currently no adventure in progress. Use !start to get started.") 
-	elif input.uid in ongoing_fights.keys():
+	elif input.uid in ongoing_fights:
 		phenny.say("You can't keep exploring... you are already in a fight!") 
 	elif input.uid:
 		userid = input.uid
@@ -453,7 +453,7 @@ def in_fight(phenny, userid):
 	if not game_started:
 		phenny.say("There is currently no adventure in progress. Use !start to get started.") 
 		return False
-	elif not userid in ongoing_fights.keys() or not ongoing_fights[userid]:
+	elif not userid in ongoing_fights or not ongoing_fights[userid]:
 		phenny.say("You can't use that command as you are not currently in a fight. To attempt a hunt, type !explore") 
 		return False
 	else:
@@ -462,7 +462,7 @@ def in_fight(phenny, userid):
 def in_fight_quiet(userid):
 	if not game_started:
 		return False
-	elif not userid in ongoing_fights.keys() or not ongoing_fights[userid]:
+	elif not userid in ongoing_fights or not ongoing_fights[userid]:
 		return False
 	else:
 		return True

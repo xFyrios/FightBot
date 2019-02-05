@@ -234,7 +234,7 @@ class Player:
 				if buff != 0 and stat != 'turns':
 					self.stats_cur_buff[stat] += buff
 					expire_round = int(cur_round + attack.buffs['turns'])
-					if expire_round not in self.stats_buff_expiry.keys():
+					if expire_round not in self.stats_buff_expiry:
 						self.stats_buff_expiry[expire_round] = {}
 					self.stats_buff_expiry[expire_round][stat] = buff
 					change_self = True
@@ -258,7 +258,7 @@ class Player:
 				if debuff != 0 and stat != 'turns':
 					monster.stats_cur_buff[stat] -= debuff
 					expire_round = int(cur_round + attack.debuffs['turns'])
-					if expire_round not in monster.stats_buff_expiry.keys():
+					if expire_round not in monster.stats_buff_expiry:
 						monster.stats_buff_expiry[expire_round] = {}
 					monster.stats_buff_expiry[expire_round][stat] = debuff * -1
 					change_monster = True
@@ -331,7 +331,7 @@ class Player:
 			string = "The %s " % target_name
 		else:
 			string = "You "
-		if effect in announce_word.keys():
+		if effect in announce_word:
 			string += "became %s!" % announce_word[effect]
 		elif effect == "Sleep":
 			string += "fell asleep!"
@@ -408,7 +408,7 @@ class Player:
 				if exp_round > 0 and exp_round < cur_round:
 					change = True
 					del self.effects[effect]
-					if effect in announce_word.keys():
+					if effect in announce_word:
 						phenny.say("%s You are no longer %s!" % (self.announce_prepend(), announce_word[effect]))
 					elif effect == 'Sleep':
 						phenny.say("%s You woke up!" % self.announce_prepend())
