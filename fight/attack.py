@@ -126,6 +126,28 @@ class Attack:
 		else:
 			return False
 
+	def is_strong_against(self, target_element):
+		"""Test if an attacks element is strong against target element"""
+		# Water > Fire > Earth > Wind > Water
+		pair = (attack_element, target_element)
+		if (self.element_type, target_element) in (
+					(ELEM_WATER, ELEM_FIRE),
+					(ELEM_FIRE, ELEM_EARTH),
+					(ELEM_EARTH, ELEM_WIND),
+					(ELEM_WIND, ELEM_WATER)):
+			return True
+
+	def is_weak_against(self, target_element):
+		"""Test if an attacks element is weak against target element"""
+		# Water > Fire > Earth > Wind > Water
+		pair = (attack_element, target_element)
+		if (self.element_type, target_element) in (
+				(ELEM_WATER, ELEM_WIND),
+				(ELEM_FIRE, ELEM_WATER),
+				(ELEM_EARTH, ELEM_FIRE),
+				(ELEM_WIND, ELEM_EARTH)):
+			return True
+
 
 # BASIC FUNCTIONS
 def create_attack(phenny, attackid, username):
