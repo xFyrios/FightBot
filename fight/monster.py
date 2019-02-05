@@ -179,10 +179,7 @@ class Monster:
 		test = (((self.stats['speed'] * 128) / player_speed) + 30 * self.run_attempts) % 256
 		random_int = randint(0, 255)
 
-		if random_int < test:
-			return True
-		else:
-			return False
+		return random_int < test:
 
 	def attack_player(self, phenny, cur_round, attack, player):
 		restored_health = False
@@ -507,44 +504,31 @@ def create_monster(phenny, monsterid, username):
 		return new_monster
 
 def get_monster_stats(phenny, monsterid, username):
-	stats = {}
 	site = phenny.callGazelleApi({'monsterid': monsterid, 'action': 'fightMonster'})
 
 	if not site or 'status' not in site:
 		phenny.write(('NOTICE', username + " An error occurred trying to get the monsters stats."))
 		return False
 	elif site['status'] == "error":
-		error_msg = site['error']
-		phenny.write(('NOTICE', username + " Error: " + error_msg))
+		phenny.write(('NOTICE', username + " Error: " + site['error']))
 		return False
+
+	stats = dict((key, site[k]) for key in (
+		'name', 'description', 'element_type',
+		'element_type_name', 'fast', 'health',
+		'experience', 'level_start', 'level_end',
+		'attack', 'defense', 'strength', 'accuracy''accuracy',
+		'speed', 'loss_level', 'rewards', 'can_run'))
+	stats['attacks'] = []
+
+	if len(site['attacks']) > 4:
+		attacks = sample(site['attacks'], 4)
 	else:
-		stats['name'] = site['name']
-		stats['description'] = site['description']
-		stats['element_type'] = site['element_type']
-		stats['element_type_name'] = site['element_type_name']
-		stats['fast'] = site['fast']
-		stats['health'] = site['health']
-		stats['experience'] = site['experience']
-		stats['level_start'] = site['level_start']
-		stats['level_end'] = site['level_end']
-		stats['attack'] = site['attack']
-		stats['defense'] = site['defense']
-		stats['strength'] = site['strength']
-		stats['accuracy'] = site['accuracy']
-		stats['speed'] = site['speed']
-		stats['loss_level'] = site['loss_level']
-		stats['rewards'] = site['rewards']
-		stats['can_run'] = site['can_run']
-		stats['attacks'] = []
+		attacks = site['attacks']
+	for attackid in attacks:
+		stats['attacks'].append(a.create_attack(phenny, int(attackid), username))
 
-		if len(site['attacks']) > 4:
-			attacks = sample(site['attacks'], 4)
-		else:
-			attacks = site['attacks']
-		for attackid in attacks:
-			stats['attacks'].append(a.create_attack(phenny, int(attackid), username))
-
-		return stats
+	return stats
 
 
 if __name__ == '__main__':
