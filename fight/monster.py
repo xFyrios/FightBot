@@ -508,8 +508,9 @@ def create_monster(phenny, monsterid, username):
 def get_monster_stats(phenny, monsterid, username):
 	stats = {}
 	site = phenny.callGazelleApi({'monsterid': monsterid, 'action': 'fightMonster'})
-	if not site:
-		phenny.write(('NOTICE', username + " Error: Site == False"))
+
+	if site == False:
+		phenny.write(('NOTICE', username + " An error occurred trying to get your user stats."))
 		return False
 	elif site['status'] == "error":
 		error_msg = site['error']
