@@ -404,11 +404,9 @@ class Player:
 
 	def expire_effects(self, phenny, cur_round):
 		announce_word = {'Blindness': 'blinded', 'Confusion': 'confused'}
-		change = False  #FIXME: Unused
 		if self.effects:
 			for effect, exp_round in self.effects.items():
 				if exp_round > 0 and exp_round < cur_round:
-					change = True  #FIXME: Unused
 					del self.effects[effect]
 					if effect in announce_word:
 						phenny.say("%s You are no longer %s!" % (self.announce_prepend(), announce_word[effect]))
