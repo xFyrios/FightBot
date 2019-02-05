@@ -121,10 +121,7 @@ class Attack:
 		threshold = strength
 		if self.high_critical_chance:
 			threshold *= 6
-		if randint(0, 30) < threshold:
-			return True
-		else:
-			return False
+		return randint(0, 30) < threshold:
 
 	def is_strong_against(self, target_element):
 		"""Test if an attacks element is strong against target element"""
@@ -154,15 +151,13 @@ class Attack:
 # BASIC FUNCTIONS
 def create_attack(phenny, attackid, username):
 	stats = phenny.callGazelleApi({'attackid': attackid, 'action': 'fightAttack'})
-
-	if stats == False or stats['status'] == "error":
+	if not stats or 'status' no in stats or stats['status'] == "error":
 		phenny.write(('NOTICE', "%s Error: One of your attacks could not load properly. (Attack ID: %d)" % (username, attackid)))
 		return False
-	else:
-		if 'damage_to_self_percent' not in stats:
-			stats['damage_to_self_percent'] = 0
-		new_attack = Attack(stats)
-		return new_attack
+
+	if 'damage_to_self_percent' not in stats:
+		stats['damage_to_self_percent'] = 0
+	return Attack(stats)
 
 # an attack you receive if you no longer have any attacks with uses left
 def create_last_resort_attack():
