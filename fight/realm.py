@@ -38,14 +38,16 @@ class Realm:
 			return False
 		if self.hunt_cost > 0:
 			success = phenny.callGazelleApi({'action': 'huntCost', 'userid': userid, 'cost': self.hunt_cost})
-			if success['status'] == 'ok':
+			if not success or 'status' not in success:
+				phenny.write(('NOTICE', username + ' Something went wrong and your exploration failed.'))
+			elif success['status'] == 'ok':
 				phenny.write(('NOTICE', username + ' You were charged ' + str(self.hunt_cost) + ' gold for your exploration.'))
 			elif 'error' in success:
 				phenny.write(('NOTICE', username + ' Error: ' + success['error']))
 			else:
 				phenny.write(('NOTICE', username + ' Something went wrong and your exploration failed.'))
 				return False
-		
+
 		# 75% chance of finding a monster
 		if randint(0,3) >= 1:
 			monster = random_choice(self.monsters)
@@ -57,23 +59,23 @@ class Realm:
 	@staticmethod
 	def color_realm_name(name, level):
 		etx = '\x03'
-		name = " " + name + " "
 		if level < 3:
-			return etx + "09,01" + name + etx
+			color = "09,01"
 		elif level < 5:
-			return etx + "03,01" + name + etx
+			color = "03,01"
 		elif level < 10:
-			return etx + "10,01" + name + etx
+			color = "10,01"
 		elif level < 25:
-			return etx + "08,01" + name + etx
+			color = "08,01"
 		elif level < 40:
-			return etx + "07,01" + name + etx
+			color = "07,01"
 		elif level < 60:
-			return etx + "04,01" + name + etx
+			color = "04,01"
 		elif level < 80:
-			return etx + "06,01" + name + etx
+			color = "06,01"
 		else:
-			return etx + "05,01" + name + etx
+			color = "05,01"
+		return "{0}{1} {2} {0}".format(etx, color, name)
 
 
 # BASIC FUNCTIONS
