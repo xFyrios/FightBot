@@ -584,7 +584,13 @@ def attack_hit(attack, userid, target):
 	test = attack.accuracy + speed_diff
 
 	if randint(0, 99) < test:
-		return True
+		if 'Blindness' in attacker.effects:
+			if randint(1,4) == 1:
+				return True
+			else:
+				return False
+		else:
+			return True
 	else:
 		return False
 
