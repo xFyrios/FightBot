@@ -181,7 +181,7 @@ class Monster:
 
 		return random_int < test
 
-	def attack_player(self, phenny, cur_round, attack, player):
+	def attack_player(self, phenny, cur_round, attack, player, first_turn = False):
 		restored_health = False
 		if attack.health > 0:
 			if (self.health + attack.health) > self.max_health:
@@ -227,7 +227,7 @@ class Monster:
 			phenny.say('%s The %s was hit with %d recoil damage!' % (self.announce_prepend(), self.name, damage_self))
 		if player.health > 0:
 			buffs_applied = self.apply_attack_buffs(phenny, cur_round, attack, player)
-			effects_applied = self.apply_attack_effects(phenny, cur_round, attack.effects, player)
+			effects_applied = self.apply_attack_effects(phenny, cur_round, attack.effects, player, first_turn)
 
 		if attack.element_type == a.ELEM_FIRE and 'Freezing' in player.effects:
 			phenny.say('%s You were thawed out by the hot attack!' % (self.announce_prepend(), player.site_username))
@@ -293,7 +293,7 @@ class Monster:
 			player.recalculate_stats()
 		return change_self or change_player
 
-	def apply_attack_effects(self, phenny, cur_round, effects, target):
+	def apply_attack_effects(self, phenny, cur_round, effects, target, first_turn = False):
 		major_effects = ['Poison', 'Burn', 'Sleep', 'Freezing']
 		change_self = False
 		change_target = False
@@ -321,7 +321,7 @@ class Monster:
 							self.announce_effect(phenny, effect)
 				else:
 					# Minor effects
-					if effect in ['CantEscape', 'Embargo', 'HPLeech', 'Blindness', 'Confusion'] and effect in target.effects:
+					if effect in ['CantEscape', 'Embargo', 'HPLeech', 'Blindness', 'Confusion', 'Flinching'] and effect in target.effects:
 						# If that status effect is already applied, silently fail
 						continue
 					if effect in ['CantEscape', 'Embargo', 'HPLeech']:
@@ -338,6 +338,9 @@ class Monster:
 						target.effects[effect] = end
 						change_target = True
 						self.announce_effect(phenny, effect)
+					elif effect == 'Flinching' and first_turn:
+						target.effects[effect] = 0
+						change_target = True
 		if change_self or change_target:
 			return True
 		else:

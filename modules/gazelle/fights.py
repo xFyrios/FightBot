@@ -134,7 +134,8 @@ def explore(phenny, input):
 			phenny.say(player.display_health())
 			phenny.say(monster.display_health())
 			if player.ghost:
-				phenny.say("You appear to be dead and have spawned as a ghost!")
+				etx = '\x02'
+				phenny.say("%s %sYou appear to be dead and have spawned as a ghost!" % (player.announce_prepend(), etx))
 			phenny.write(('NOTICE', username + " Type !mstats for the monsters full stats or !pstats for your full stats."))
 			if monster.fast and randint(1, 10) <= 8: # 80% chance of suprise attack for 'fast' creatures
 				phenny.say("%s The %s surprises you with an attack!" % (monster.announce_prepend(), monster.name))
@@ -267,9 +268,8 @@ def do_round_moves(phenny, input, player_attack):
 				else:
 					do_monster_first(phenny, input, players_choice, monsters_choice)
 
-		#TODO: After both attacks, apply status effects. Check hp of each creature afterwards to see if dead.
 		if in_fight_quiet(input.uid):
-			do_effects(phenny, input.uid)
+			do_effects_damage(phenny, input.uid)
 
 		if in_fight_quiet(input.uid):
 			phenny.say(player.display_health())
@@ -284,12 +284,17 @@ def do_player_first(phenny, input, players_choice, monsters_choice):
 	elif players_choice == 'sleep':
 		do_player_sleep(phenny, input.uid)
 	else:
-		do_player_attack(phenny, players_choice, input.uid, input.nick)
+		do_player_attack(phenny, players_choice, input.uid, input.nick, True)
 
 	if in_fight_quiet(input.uid):
 		monster = ongoing_fights[input.uid]['monster']
 		if 'Sleep' in monster.effects:
 			monsters_choice = 'sleep'
+			
+		if 'Flinching' in monster.effects:
+			phenny.say("%s The %s flinched and couldn't attack!" % (monster.announce_prepend(), monster.name))
+			del monster.effects['Flinching']
+			return False
 
 		if monsters_choice == 'run':
 			do_monster_run(phenny, input.uid)
@@ -305,12 +310,17 @@ def do_monster_first(phenny, input, players_choice, monsters_choice):
 	elif monsters_choice == 'sleep':
 		do_monster_sleep(phenny, input.uid)
 	else:
-		do_monster_attack(phenny, monsters_choice, input.uid)
+		do_monster_attack(phenny, monsters_choice, input.uid, True)
 
 	if in_fight_quiet(input.uid):
 		player = ongoing_fights[input.uid]['player']
 		if 'Sleep' in player.effects:
 			players_choice = 'sleep'
+
+		if 'Flinching' in player.effects:
+			phenny.say("%s You flinched and couldn't attack!" % (player.announce_prepend()))
+			del player.effects['Flinching']
+			return False
 			
 		if players_choice == 'run':
 			do_player_run(phenny, input.uid, input.nick)
@@ -358,7 +368,7 @@ def do_monster_sleep(phenny, userid):
 		phenny.say("%s The %s is fast asleep and cannot attack. ZzzZZzzZZzz..." % (monster.announce_prepend(), monster.name))
 
 # Execute an attack. Called by the do_round_moves function.
-def do_player_attack(phenny, attackid, userid, username):
+def do_player_attack(phenny, attackid, userid, username, first_turn = False):
 	player = ongoing_fights[userid]['player']
 	monster = ongoing_fights[userid]['monster']
 
@@ -376,13 +386,13 @@ def do_player_attack(phenny, attackid, userid, username):
 
 	if attack_hit(attack, userid, 'monster'):
 		cur_round = ongoing_fights[userid]['data']['round']
-		player.attack_monster(phenny, cur_round, attack, monster)
+		player.attack_monster(phenny, cur_round, attack, monster, first_turn)
 		if player.health <= 0 or monster.health <= 0:
 			end_fight(phenny, userid)
 	else:
 		phenny.say("%s %s's attack missed!" % (player.announce_prepend(), player.site_username))
 
-def do_monster_attack(phenny, attack, userid):
+def do_monster_attack(phenny, attack, userid, first_turn = False):
 	player = ongoing_fights[userid]['player']
 	monster = ongoing_fights[userid]['monster']
 
@@ -399,14 +409,14 @@ def do_monster_attack(phenny, attack, userid):
 
 	if attack_hit(attack, userid, 'player'):
 		cur_round = ongoing_fights[userid]['data']['round']
-		monster.attack_player(phenny, cur_round, attack, player)
+		monster.attack_player(phenny, cur_round, attack, player, first_turn)
 		if player.health <= 0 or monster.health <= 0:
 			end_fight(phenny, userid)
 	else:
 		phenny.say("%s The %s's attack missed!" % (monster.announce_prepend(), monster.name))
 
 # Apply status effects
-def do_effects(phenny, userid):
+def do_effects_damage(phenny, userid):
 	player = ongoing_fights[userid]['player']
 	monster = ongoing_fights[userid]['monster']
 

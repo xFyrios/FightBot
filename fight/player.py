@@ -169,7 +169,7 @@ class Player:
 
 		return random_int < test
 
-	def attack_monster(self, phenny, cur_round, attack, monster):
+	def attack_monster(self, phenny, cur_round, attack, monster, first_turn = False):
 		restored_health = False
 		if attack.health > 0:
 			if (self.health + attack.health) > self.max_health:
@@ -215,7 +215,7 @@ class Player:
 			phenny.say('%s You were hit with %d recoil damage!' % (self.announce_prepend(), damage_self))
 		if monster.health > 0:
 			buffs_applied = self.apply_attack_buffs(phenny, cur_round, attack, monster)
-			effects_applied = self.apply_attack_effects(phenny, cur_round, attack.effects, monster)
+			effects_applied = self.apply_attack_effects(phenny, cur_round, attack.effects, monster, first_turn)
 
 		if attack.element_type == 3 and 'Freezing' in monster.effects:
 			phenny.say('%s The %s was thawed out by the hot attack!' % (self.announce_prepend(), monster.name))
@@ -281,7 +281,7 @@ class Player:
 			monster.recalculate_stats()
 		return change_self or change_monster
 
-	def apply_attack_effects(self, phenny, cur_round, effects, target):
+	def apply_attack_effects(self, phenny, cur_round, effects, target, first_turn = False):
 		major_effects = ['Poison', 'Burn', 'Sleep', 'Freezing']
 		change_self = False
 		change_target = False
@@ -309,7 +309,7 @@ class Player:
 							self.announce_effect(phenny, effect, target.name)
 				else:
 					# Minor effects
-					if effect in ['CantEscape', 'Embargo', 'HPLeech', 'Blindness', 'Confusion'] and effect in target.effects:
+					if effect in ['CantEscape', 'Embargo', 'HPLeech', 'Blindness', 'Confusion', 'Flinching'] and effect in target.effects:
 						# If that status effect is already applied, silently fail
 						continue
 					if effect in ['CantEscape', 'Embargo', 'HPLeech']:
@@ -326,6 +326,9 @@ class Player:
 						target.effects[effect] = end
 						change_target = True
 						self.announce_effect(phenny, effect, target.name)
+					elif effect == 'Flinching' and first_turn:
+						target.effects[effect] = 0
+						change_target = True
 		return change_self or change_target
 
 	def announce_effect(self, phenny, effect, target_name = False):
