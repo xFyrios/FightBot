@@ -224,6 +224,24 @@ class Player:
 		if no_damage and not buffs_applied and not effects_applied and not restored_health:
 			phenny.say('%s No damage was done to the %s.' % (self.announce_prepend(), monster.name))
 
+	def attack_self_confused(self, phenny, monster):
+		base_damage = 40
+		damage = floor(2 * max(self.level, 1) / 5 + 2)
+		damage = floor(damage * base_damage * max(self.stats['attack'], 1) / max(self.stats['defense'], 1))
+		damage = floor(damage / 50) + 2
+		# Damage randomizer
+		random_int = (float(randint(85,100)) / 100)
+		damage = floor(damage * random_int)
+
+		if damage > 0:
+			self.health -= damage
+			if self.health < 0:
+				self.health = 0
+			phenny.say('%s You hurt yourself in your confusion! You did %d damage to yourself.' % (self.announce_prepend(), damage))
+		else:
+			phenny.say('%s You got confused and attacked yourself... but did no damage.' % (self.announce_prepend()))
+
+
 	def apply_attack_buffs(self, phenny, cur_round, attack, monster):
 		change_self = False
 		change_monster = False

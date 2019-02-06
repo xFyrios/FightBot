@@ -234,7 +234,24 @@ class Monster:
 			del player.effects['Freezing']
 
 		if no_damage and not buffs_applied and not effects_applied and not restored_health:
-			phenny.say('%s No damage was done to you.' % self.announce_prepend(), )
+			phenny.say('%s No damage was done to you.' % self.announce_prepend())
+
+	def attack_self_confused(self, phenny, player):
+		base_damage = 40
+		damage = floor(2 * max(self.level, 1) / 5 + 2)
+		damage = floor(damage * base_damage * max(self.stats['attack'], 1) / max(self.stats['defense'], 1))
+		damage = floor(damage / 50) + 2
+		# Damage randomizer
+		random_int = (float(randint(85,100)) / 100)
+		damage = floor(damage * random_int)
+
+		if damage > 0:
+			self.health -= damage
+			if self.health < 0:
+				self.health = 0
+			phenny.say('%s The %s hurt itself in its confusion! It did %d damage to itself.' % (self.announce_prepend(), self.name, damage))
+		else:
+			phenny.say('%s The %s got confused and attacked itself... but did no damage.' % (self.announce_prepend(), self.name))
 
 	def apply_attack_buffs(self, phenny, cur_round, attack, player):
 		change_self = False

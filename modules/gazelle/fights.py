@@ -294,6 +294,8 @@ def do_player_first(phenny, input, players_choice, monsters_choice):
 		if 'Flinching' in monster.effects:
 			phenny.say("%s The %s flinched and couldn't attack!" % (monster.announce_prepend(), monster.name))
 			del monster.effects['Flinching']
+			if 'Confusion' in monster.effects:
+				monster.effects['Confusion'] += 1
 			return False
 
 		if monsters_choice == 'run':
@@ -320,6 +322,8 @@ def do_monster_first(phenny, input, players_choice, monsters_choice):
 		if 'Flinching' in player.effects:
 			phenny.say("%s You flinched and couldn't attack!" % (player.announce_prepend()))
 			del player.effects['Flinching']
+			if 'Confusion' in player.effects:
+				player.effects['Confusion'] += 1
 			return False
 			
 		if players_choice == 'run':
@@ -334,6 +338,9 @@ def do_player_run(phenny, userid, username):
 	if in_fight_quiet(userid):
 		player = ongoing_fights[userid]['player']
 		monster = ongoing_fights[userid]['monster']
+
+		if 'Confusion' in player.effects:
+			player.effects['Confusion'] += 1
 
 		if 'CantEscape' in player.effects:
 			phenny.say("%s You were blocked and cannot run!" % player.announce_prepend())
@@ -356,16 +363,22 @@ def do_monster_run(phenny, userid):
 			end_fight(phenny, userid)
 		else:
 			phenny.say("%s The %s attempted to run from you but failed!" % (monster.announce_prepend(), monster.name))
+			if 'Confusion' in monster.effects:
+				monster.effects['Confusion'] += 1
 
 def do_player_sleep(phenny, userid):
 	if in_fight_quiet(userid):
 		player = ongoing_fights[userid]['player']
 		phenny.say("%s %s is fast asleep and cannot attack. ZzzZZzzZZzz..." % (player.announce_prepend(), player.site_username))
+		if 'Confusion' in player.effects:
+			player.effects['Confusion'] += 1
 
 def do_monster_sleep(phenny, userid):
 	if in_fight_quiet(userid):
 		monster = ongoing_fights[userid]['monster']
 		phenny.say("%s The %s is fast asleep and cannot attack. ZzzZZzzZZzz..." % (monster.announce_prepend(), monster.name))
+		if 'Confusion' in monster.effects:
+			monster.effects['Confusion'] += 1
 
 # Execute an attack. Called by the do_round_moves function.
 def do_player_attack(phenny, attackid, userid, username, first_turn = False):
@@ -375,6 +388,8 @@ def do_player_attack(phenny, attackid, userid, username, first_turn = False):
 	if 'Freezing' in player.effects:
 		if randint(1,5) != 1:
 			phenny.say("%s %s is frozen solid and cannot attack!" % (player.announce_prepend(), player.site_username))
+			if 'Confusion' in player.effects:
+				player.effects['Confusion'] += 1
 			return False
 		else:
 			phenny.say("%s %s is frozen solid... but breaks free!" % (player.announce_prepend(), player.site_username))
@@ -383,6 +398,12 @@ def do_player_attack(phenny, attackid, userid, username, first_turn = False):
 	attack = player.attacks[attackid]
 	phenny.say("%s %s used %s." % (player.announce_prepend(), player.site_username, attack.name))
 	attack.uses += 1
+
+	if 'Confusion' in player.effects and randint(1,3) == 1:
+		player.attack_self_confused(phenny, monster)
+		if player.health <= 0 or monster.health <= 0:
+			end_fight(phenny, userid)
+		return False
 
 	if attack_hit(attack, userid, 'monster'):
 		cur_round = ongoing_fights[userid]['data']['round']
@@ -399,6 +420,8 @@ def do_monster_attack(phenny, attack, userid, first_turn = False):
 	if 'Freezing' in monster.effects:
 		if randint(1,5) != 1:
 			phenny.say("%s The %s is frozen solid and cannot attack!" % (monster.announce_prepend(), monster.name))
+			if 'Confusion' in monster.effects:
+				monster.effects['Confusion'] += 1
 			return False
 		else:
 			phenny.say("%s The %s is frozen solid... but breaks free!" % (monster.announce_prepend(), monster.name))
@@ -406,6 +429,12 @@ def do_monster_attack(phenny, attack, userid, first_turn = False):
 
 	phenny.say("%s The %s used %s." % (monster.announce_prepend(), monster.name, attack.name))
 	attack.uses += 1
+
+	if 'Confusion' in monster.effects and randint(1,3) == 1:
+		monster.attack_self_confused(phenny, player)
+		if player.health <= 0 or monster.health <= 0:
+			end_fight(phenny, userid)
+		return False
 
 	if attack_hit(attack, userid, 'player'):
 		cur_round = ongoing_fights[userid]['data']['round']
