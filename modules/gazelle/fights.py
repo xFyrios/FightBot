@@ -7,6 +7,7 @@ from math import floor
 from threading import Timer
 
 REALM_CYCLE = 60 * 60 * 6  # How often to cycle to a new realm (6 hours)
+ATTACK_TIMEOUT = 120 # How long a player has to choose an attack before a random attack will be chosen for them
 
 game_started = False  # set to true after !start has been called
 current_realm = False  # holds the realm object
@@ -139,7 +140,7 @@ def explore(phenny, input):
 			phenny.write(('NOTICE', username + " Type !mstats for the monsters full stats or !pstats for your full stats."))
 			if monster.fast and randint(1, 10) <= 8: # 80% chance of suprise attack for 'fast' creatures
 				phenny.say("%s The %s surprises you with an attack!" % (monster.announce_prepend(), monster.name))
-				monsters_choice = monster.choose_attack()
+				monsters_choice = monster.choose_attack(current_realm.id)
 				if monsters_choice == 'run':
 					do_monster_run(phenny, input.uid)
 				else:
@@ -147,6 +148,8 @@ def explore(phenny, input):
 			if in_fight_quiet(input.uid):
 				player.can_attack = True
 				player.attack_options(phenny, username)
+				player.attack_timer = Timer(ATTACK_TIMEOUT, force_attack, [phenny, input])
+				player.attack_timer.start()
 explore.commands = ['explore', 'hunt']
 explore.priority = 'low'
 explore.example = '!explore'
@@ -208,7 +211,10 @@ def attack(phenny, input):
 				return False
 			if player.can_attack:
 				player.can_attack = False
-				do_round_moves(phenny, input, attack_id)
+				if player.attack_timer and player.attack_timer.is_alive():
+					player.attack_timer.cancel()
+					player.attack_timer = False
+					do_round_moves(phenny, input, attack)
 			else:
 				phenny.write(('NOTICE', input.nick + " It is not your turn to attack."))
 		else:
@@ -216,6 +222,18 @@ def attack(phenny, input):
 attack.commands = ['attack']
 attack.priority = 'high'
 attack.example = '!attack 1'
+
+# If a user doesn't choose an attack in time, run this function
+def force_attack(phenny, input):
+	if in_fight_quiet(input.uid):
+		player = ongoing_fights[input.uid]['player']
+		if player.can_attack:
+			player.can_attack = False
+			attack = player.choose_auto_attack(current_realm.id)
+			print attack
+			phenny.write(('NOTICE', input.nick + " You took too long to choose an attack and a random attack is now being chosen for you."))
+			do_round_moves(phenny, input, attack)
+
 
 ############################
 # IN-FIGHT - PROCESS MOVES #
@@ -239,14 +257,9 @@ def do_round_moves(phenny, input, player_attack):
 		if 'Sleep' in monster.effects:
 			monsters_choice = 'sleep'
 		else:
-			monsters_choice = monster.choose_attack()
+			monsters_choice = monster.choose_attack(current_realm.id)
 
-		if players_choice == 'run':
-			players_attack_priority = get_attack_priority('run')
-		elif players_choice == 'sleep':
-			players_attack_priority = get_attack_priority('sleep')
-		else:
-			players_attack_priority = get_attack_priority(player.attacks[players_choice])
+		players_attack_priority = get_attack_priority(players_choice)
 		monsters_attack_priority = get_attack_priority(monsters_choice)
 
 		#Expire buffs
@@ -275,6 +288,8 @@ def do_round_moves(phenny, input, player_attack):
 			phenny.say(player.display_health())
 			phenny.say(monster.display_health())
 			player.attack_options(phenny, input.nick)
+			player.attack_timer = Timer(ATTACK_TIMEOUT, force_attack, [phenny, input])
+			player.attack_timer.start()
 			player.can_attack = True
 
 # Perform attacks/runs with the player going first. Called by the do_round_moves function.
@@ -381,7 +396,7 @@ def do_monster_sleep(phenny, userid):
 			monster.effects['Confusion'] += 1
 
 # Execute an attack. Called by the do_round_moves function.
-def do_player_attack(phenny, attackid, userid, username, first_turn = False):
+def do_player_attack(phenny, attack, userid, username, first_turn = False):
 	player = ongoing_fights[userid]['player']
 	monster = ongoing_fights[userid]['monster']
 
@@ -395,7 +410,6 @@ def do_player_attack(phenny, attackid, userid, username, first_turn = False):
 			phenny.say("%s %s is frozen solid... but breaks free!" % (player.announce_prepend(), player.site_username))
 			del player.effects['Freezing']
 
-	attack = player.attacks[attackid]
 	phenny.say("%s %s used %s." % (player.announce_prepend(), player.site_username, attack.name))
 	attack.uses += 1
 

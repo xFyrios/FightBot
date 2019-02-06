@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import fight.attack as a
-from random import randint
+from random import randint, choice
 from math import floor
 
 # This object is used to setup a player for a fight. It is destroyed after the fight.
@@ -56,6 +56,7 @@ class Player:
 		self.undo_buffs = {}
 		self.undo_debuffs = {}
 		self.effects = {}
+		self.attack_timer = False
 
 		if self.health == 0:
 			self.max_health = 5
@@ -156,6 +157,14 @@ class Player:
 			phenny.write(('NOTICE', username + string))
 		if 'CantEscape' not in self.effects:
 			phenny.write(('NOTICE', username + " %d - Run [!run]" % (i+1)))
+
+	# Used when a player doesn't select an attack in time
+	def choose_auto_attack(self, cur_realm_id):
+		options = filter(lambda attack: attack.uses < attack.max_uses and (attack.realm_requirement == 0 or attack.realm_requirement != cur_realm_id), self.attacks)
+		if len(options) <= 0:
+			self.attacks.append(a.create_last_resort_attack())
+			options = filter(lambda attack: attack.uses < attack.max_uses and (attack.realm_requirement == 0 or attack.realm_requirement != cur_realm_id), self.attacks)
+		return choice(options)
 
 
 	# Run and Attack functions

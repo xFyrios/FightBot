@@ -162,13 +162,13 @@ class Monster:
 		return health
 
 	# Attack functions
-	def choose_attack(self):
-		options = filter(lambda attack: attack.uses < attack.max_uses, self.attacks)
+	def choose_attack(self, cur_realm_id):
+		options = filter(lambda attack: attack.uses < attack.max_uses and (attack.realm_requirement == 0 or attack.realm_requirement != cur_realm_id), self.attacks)
 		if self.can_run and 'CantEscape' not in self.effects and randint(1,10) == 1: # 10% chance of running
 			return 'run'
 		if len(options) <= 0:
 			self.attacks.append(a.create_last_resort_attack())
-			options = filter(lambda attack: attack.uses < attack.max_uses, self.attacks)
+			options = filter(lambda attack: attack.uses < attack.max_uses and (attack.realm_requirement == 0 or attack.realm_requirement != cur_realm_id), self.attacks)
 		return choice(options)
 
 	def run(self, player):
