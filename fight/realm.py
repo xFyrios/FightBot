@@ -10,7 +10,7 @@ class Realm:
 		self.name = name
 		self.level = int(level)
 		self.hunt_cost = int(cost)
-		self.monsters = map(int, monsters)
+		self.monsters = monsters
 
 	def __str__(self):
 		monster_count = len(self.monsters)
@@ -80,7 +80,10 @@ class Realm:
 
 # BASIC FUNCTIONS
 def create(id, name, level, cost, monsters):
-	return Realm(id, name, level, cost, monsters)
+	monsters_list = []
+	for monsterid, amount in monsters.items():
+		monsters_list += int(amount) * [int(monsterid)]
+	return Realm(id, name, level, cost, monsters_list)
 
 
 if __name__ == '__main__':
