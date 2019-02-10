@@ -507,7 +507,8 @@ def get_monster_stats(phenny, monsterid, username):
 		attacks = sample(site['attacks'], 4)
 	else:
 		attacks = site['attacks']
-	stats['attacks'] = [a.create_attack(phenny, int(i), username) for i in attacks]
+	attack_objs = [a.create_attack(phenny, int(i), username) for i in attacks]
+	stats['attacks'] = filter(None, attack_objs)
 
 	return stats
 

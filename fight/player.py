@@ -492,7 +492,7 @@ def get_user_stats(phenny, uid, username):
 	print uid
 	site = phenny.callGazelleApi({'uid': uid, 'action': 'fightUserStats'})
 
-	if site == False:
+	if not site or 'status' not in site:
 		phenny.write(('NOTICE', username + " An error occurred trying to get your user stats."))
 		return False
 	elif site['status'] == "error":
@@ -512,9 +512,10 @@ def get_user_stats(phenny, uid, username):
 		stats['strength'] = site['strength']
 		stats['accuracy'] = site['accuracy']
 		stats['speed'] = site['speed']
-		stats['attacks'] = []
+		attacks = []
 		for attackid in site['attacks']:
-			stats['attacks'].append(a.create_attack(phenny, int(attackid), username))
+			attacks.append(a.create_attack(phenny, int(attackid), username))
+		stats['attacks'] = filter(None, attacks)
 
 		return stats
 
