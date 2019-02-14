@@ -527,12 +527,15 @@ def get_user_stats(phenny, uid, username):
 			attacks.append(a.create_attack(phenny, int(attackid), username))
 		stats['attacks'] = filter(None, attacks)
 
-		items = {}
-		for slotid, attackid in site['items'].items():
-			attack = a.create_attack(phenny, int(attackid), username)
-			attack.is_item = True
-			items[int(slotid)] = attack
-		stats['items'] = {k:v for k,v in items.items() if v is not None}
+		if not site['items']:
+			stats['items'] = {}
+		else:
+			items = {}
+			for slotid, attackid in site['items'].items():
+				attack = a.create_attack(phenny, int(attackid), username)
+				attack.is_item = True
+				items[int(slotid)] = attack
+			stats['items'] = {k:v for k,v in items.items() if v is not None}
 
 		return stats
 
