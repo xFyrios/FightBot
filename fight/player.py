@@ -49,7 +49,7 @@ class Player:
 		self.stats_buff_expiry = {}
 
 		self.attacks = stats['attacks']
-		self.items = []
+		self.items = stats['items']
 
 		self.can_attack = False
 		self.run_attempts = 0
@@ -70,7 +70,7 @@ class Player:
 			string += " (Username: %s)" % self.site_username
 		if self.element_type > 0:
 			string += "  Element: %s" % self.element_type_name
-		string += "  Health: %s(%d/%d)  Level: %d  XP: %d  |  Attack: %.1f  Defense: %.1f  Strength: %.1f  Accuracy: %.1f  Speed: %.1f  |  Attack Count: %d" % (self.visual_health(False), self.health, self.max_health, self.level, self.experience, self.stats['attack'], self.stats['defense'], self.stats['strength'], self.stats['accuracy'], self.stats['speed'], len(self.attacks))
+		string += "  Health: %s(%d/%d)  Level: %d  XP: %d  |  Attack: %.1f  Defense: %.1f  Strength: %.1f  Accuracy: %.1f  Speed: %.1f  |  Attack Count: %d | Item Count: %d" % (self.visual_health(False), self.health, self.max_health, self.level, self.experience, self.stats['attack'], self.stats['defense'], self.stats['strength'], self.stats['accuracy'], self.stats['speed'], len(self.attacks), len(self.items))
 		if self.effects:
 			string += " | Status Ailments: %s" % (", ".join(self.effects.keys()))
 		if self.ghost:
@@ -155,8 +155,17 @@ class Player:
 			else:
 				string = " %d - %s [!attack %d]" % (i, attack.display_attack_option(), i)
 			phenny.write(('NOTICE', username + string))
+		if len(self.items) > 0:
+			phenny.write(('NOTICE', username + " %d - Use an item [!items]" % (i+1)))
+			i += 1
 		if 'CantEscape' not in self.effects:
 			phenny.write(('NOTICE', username + " %d - Run [!run]" % (i+1)))
+
+	def item_options(self, phenny, username):
+		phenny.write(('NOTICE', username + " Your items:"))
+		for slotid, attack in self.items.items():
+			string = " %d - %s [!item %d]" % (slotid, attack.name, slotid)
+			phenny.write(('NOTICE', username + string))
 
 	# Used when a player doesn't select an attack in time
 	def choose_auto_attack(self, cur_realm_id):
@@ -512,10 +521,18 @@ def get_user_stats(phenny, uid, username):
 		stats['strength'] = site['strength']
 		stats['accuracy'] = site['accuracy']
 		stats['speed'] = site['speed']
+
 		attacks = []
 		for attackid in site['attacks']:
 			attacks.append(a.create_attack(phenny, int(attackid), username))
 		stats['attacks'] = filter(None, attacks)
+
+		items = {}
+		for slotid, attackid in site['items'].items():
+			attack = a.create_attack(phenny, int(attackid), username)
+			attack.is_item = True
+			items[int(slotid)] = attack
+		stats['items'] = {k:v for k,v in items.items() if v is not None}
 
 		return stats
 

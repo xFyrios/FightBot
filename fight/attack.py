@@ -32,6 +32,9 @@ class Attack:
 		self.buffs_by_stage = stats['buffs_by_stage']
 		self.debuffs_by_stage = stats['debuffs_by_stage']
 		self.effects = stats['effects']
+		
+		self.is_item = False
+		self.item_id = False
 
 		for key,v in self.effects.items():
 			self.effects[key] = int(self.effects[key])

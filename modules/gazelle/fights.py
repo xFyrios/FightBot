@@ -17,13 +17,15 @@ ongoing_fights = {} # holds the player and monster objects for ongoing fights.
 					# with Player under key 'player', and Monster under 'monster':  {userid: {'player': Player, 'monster': Monster, 'data': {}}}
 					# 'data' can hold miscellaneous data such as the round #
 
-arguments = {'start': 0, 'setrealm': 1, 'realmlock': 0, 'realmunlock': 0, 'info': 0, 'explore': 0, 'stats': 0, 'run': 0, 'attack': 1,}
+arguments = {'start': 0, 'setrealm': 1, 'realmlock': 0, 'realmunlock': 0, 'info': 0, 'explore': 0, 'stats': 0, 'run': 0, 'attack': 1, 'items': 0, 'item': 1}
 help = OrderedDict([('start', "If adventuring has not already begun, use !start to get the bot going."),
 					('info', "To get info on the current realm you are exploring, use the !info or !status command."),
 					('explore', "To attempt a hunt, use the command !explore or !hunt."),
 					('pstats', "Show your full player stats with !stats. Only works when you are in a fight. Alternative: !mystats or !u"),
 					('mstats', "Show the monsters full stats (that you are versing) with !mstats. Only works when you are in a fight. Alternative: !cstats or !mu"),
+					('items', "Shows a list of your items that you can use in battle. Only works when you are in a fight."),
 					('attack', "To attack a creature use the command !attack #, where # is the number of the attack. Only works when you are in a fight."),
+					('item', "To attack a creature with an item use the command !item #, where # is the number of the item. Only works when you are in a fight."),
 					('run', "Attempt to !run from a monster. Only works when you are in a fight and it is your turn to attack."),
 					('setrealm', "To change to a new realm, use !setrealm realmid. Only useable by mods."),
 					('realmlock', "To stop the realm from changing once every %d hours, use !realmlock. To unlock it again, use !realmunlock. Only useable by mods." % REALM_CYCLE)])
@@ -214,7 +216,7 @@ def attack(phenny, input):
 				if player.attack_timer and player.attack_timer.is_alive():
 					player.attack_timer.cancel()
 					player.attack_timer = False
-					do_round_moves(phenny, input, attack)
+				do_round_moves(phenny, input, attack)
 			else:
 				phenny.write(('NOTICE', input.nick + " It is not your turn to attack."))
 		else:
@@ -230,9 +232,62 @@ def force_attack(phenny, input):
 		if player.can_attack:
 			player.can_attack = False
 			attack = player.choose_auto_attack(current_realm.id)
-			print attack
 			phenny.write(('NOTICE', input.nick + " You took too long to choose an attack and a random attack is now being chosen for you."))
 			do_round_moves(phenny, input, attack)
+
+def item(phenny, input):
+	args = check_args(phenny, input.group(0))
+	if args:
+		if in_fight(phenny, input.uid):
+			item_id = args[0]
+			if not item_id.isdigit():	
+				phenny.write(('NOTICE', input.nick + " You did not enter a valid item #. Note that this should be numeric."))
+				return False
+			else:
+				item_id = int(item_id)
+
+			player = ongoing_fights[input.uid]['player']
+			if item_id > 0 and item_id in player.items.keys() and player.items[item_id]:
+				attack = player.items[item_id]
+				if attack.realm_requirement > 0 and current_realm.id != attack.realm_requirement:
+					phenny.write(('NOTICE', input.nick + " That item cannot be used in this realm! It will only work in the %s realm." % attack.realm_requirement_name))
+					return False
+				if player.can_attack:
+					player.can_attack = False
+					if player.attack_timer and player.attack_timer.is_alive():
+						player.attack_timer.cancel()
+						player.attack_timer = False
+
+					item_can_use = phenny.callGazelleApi({'action': 'fightCheckItem', 'userid': player.uid, 'slotid': item_id, 'attackid': attack.id})
+					if not item_can_use or 'status' not in item_can_use or item_can_use['status'] == "error":
+						if not item_can_use:
+							phenny.write(('NOTICE', input.nick + " An error occurred."))
+						elif item_can_use['status'] == "error":
+							phenny.write(('NOTICE', input.nick + " Error: " + item_can_use['error']))
+						player.attack_timer = Timer(ATTACK_TIMEOUT, force_attack, [phenny, input])
+						player.attack_timer.start()
+						player.can_attack = True
+					else:
+						attack.item_id = item_id
+						do_round_moves(phenny, input, attack)
+				else:
+					phenny.write(('NOTICE', input.nick + " It is not your turn to attack."))
+			else:
+				phenny.write(('NOTICE', input.nick + " That is not a valid item #."))
+	else:
+		items(phenny, input)
+item.commands = ['item']
+item.priority = 'high'
+item.example = '!item 1'
+
+def items(phenny, input):
+	if in_fight(phenny, input.uid):
+		player = ongoing_fights[input.uid]['player']
+		player.item_options(phenny, input.nick)
+items.commands = ['items']
+items.priority = 'medium'
+items.example = '!items'
+
 
 
 ############################
@@ -410,8 +465,20 @@ def do_player_attack(phenny, attack, userid, username, first_turn = False):
 			phenny.say("%s %s is frozen solid... but breaks free!" % (player.announce_prepend(), player.site_username))
 			del player.effects['Freezing']
 
-	phenny.say("%s %s used %s." % (player.announce_prepend(), player.site_username, attack.name))
-	attack.uses += 1
+	if attack.is_item:
+		item_id = attack.item_id
+		item_use = phenny.callGazelleApi({'action': 'fightUseItem', 'userid': player.uid, 'slotid': item_id})
+		if item_use['status'] == 'ok':
+			phenny.say("%s %s used %s (item)." % (player.announce_prepend(), player.site_username, attack.name))
+			del player.items[item_id]
+		else:
+			phenny.write(('NOTICE', username + " Error: " + item_use['error']))
+			attack = player.choose_auto_attack(current_realm.get_id())
+			phenny.say("%s %s failed to use their item. Used %s instead." % (player.announce_prepend(), player.site_username, attack.name))
+			attack.uses += 1
+	else:
+		phenny.say("%s %s used %s." % (player.announce_prepend(), player.site_username, attack.name))
+		attack.uses += 1
 
 	if 'Confusion' in player.effects and randint(1,3) == 1:
 		player.attack_self_confused(phenny, monster)
