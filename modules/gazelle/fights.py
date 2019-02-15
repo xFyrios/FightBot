@@ -162,9 +162,13 @@ explore.example = '!explore'
 ######################
 
 def player_stats(phenny, input):
-	if in_fight(phenny, input.uid):
+	if in_fight_quiet(input.uid):
 		player = ongoing_fights[input.uid]['player']
 		player.display_full_stats(phenny)
+	else:
+		player = p.create_player(phenny, input.uid, input.nick)
+		player.display_full_stats(phenny)
+		del player
 player_stats.commands = ['pstats', 'playerstats', 'mystats', 'u']
 player_stats.priority = 'medium'
 player_stats.example = '!pstats'
