@@ -644,9 +644,13 @@ def end_fight(phenny, userid):
 			phenny.say("%sThe %s died! You win the battle!" % (etx, monster.name))
 
 		if player.health > 0 and monster.health <= 0: # if player won
+			etx = '\x02'
+			# TODO: Enable rewards when ready to go live
+			#drops = phenny.callGazelleApi({'action': 'fightReward', 'userid': player.uid, 'monsterid': monster.id})
+			#if drops and 'msg' in drops:
+				#phenny.say("%s%s" % (etx, drops['msg']))
 			experience = player.calculate_experience_gain(monster)
 			new_level = floor((player.experience + experience) ** (1. / 3))
-			etx = '\x02'
 			phenny.say("%sYou gained %d experience." % (etx, experience))
 			phenny.callGazelleApi({'userid': userid, 'experience': experience, 'action': 'fightAddExperience'})
 			if new_level > player.level:
