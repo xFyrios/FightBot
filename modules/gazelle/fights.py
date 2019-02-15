@@ -233,6 +233,9 @@ def force_attack(phenny, input):
 			player.can_attack = False
 			attack = player.choose_auto_attack(current_realm.id)
 			phenny.write(('NOTICE', input.nick + " You took too long to choose an attack and a random attack is now being chosen for you."))
+			if player.attack_timer and player.attack_timer.is_alive():
+					player.attack_timer.cancel()
+					player.attack_timer = False
 			do_round_moves(phenny, input, attack)
 
 def item(phenny, input):
@@ -534,21 +537,25 @@ def do_effects_damage(phenny, userid):
 		if 'Poison' in player.effects or 'Burn' in player.effects:
 			eighth_health = max(floor(player.max_health / 8), 1)
 			player.health -= eighth_health
-			if player.health < 0:
+			if player.health <= 0:
 				player.health = 0
 			if 'Poison' in player.effects:
 				phenny.say('%s You were hurt by poison! You took %d damage.' % (player.announce_prepend(), eighth_health))
 			else:
 				phenny.say('%s You were hurt by your burn! You took %d damage.' % (player.announce_prepend(), eighth_health))
+			if player.health <= 0:
+				end_fight(phenny, userid)
 		if 'Poison' in monster.effects or 'Burn' in monster.effects:
 			eighth_health = max(floor(monster.max_health / 8), 1)
 			monster.health -= eighth_health
-			if monster.health < 0:
+			if monster.health <= 0:
 				monster.health = 0
 			if 'Poison' in monster.effects:
 				phenny.say('%s The %s is hurt by poison! It took %d damage.' % (monster.announce_prepend(), monster.name, eighth_health))
 			else:
 				phenny.say('%s The %s is hurt by its burn! It took %d damage.' % (monster.announce_prepend(), monster.name, eighth_health))
+			if monster.health <= 0:
+				end_fight(phenny, userid)
 		
 		if 'HPLeech' in player.effects:
 			eighth_health = max(floor(player.max_health / 8), 1)
@@ -560,6 +567,8 @@ def do_effects_damage(phenny, userid):
 			else:
 				monster.health += eighth_health
 			phenny.say('%s Your health was sapped! The %s stole %d HP from you.' % (monster.announce_prepend(), monster.name, eighth_health))
+			if player.health <= 0:
+				end_fight(phenny, userid)
 		if 'HPLeech' in monster.effects:
 			eighth_health = max(floor(monster.max_health / 8), 1)
 			monster.health -= eighth_health
@@ -570,6 +579,8 @@ def do_effects_damage(phenny, userid):
 			else:
 				player.health += eighth_health
 			phenny.say('%s You sapped the %s\'s health! You stole %d HP from it.' % (player.announce_prepend(), monster.name, eighth_health))
+			if monster.health <= 0:
+				end_fight(phenny, userid)
 
 		if player.health <= 0 or monster.health <= 0:
 			end_fight(phenny, userid)
