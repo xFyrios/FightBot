@@ -32,6 +32,9 @@ class Attack:
 		self.buffs_by_stage = stats['buffs_by_stage']
 		self.debuffs_by_stage = stats['debuffs_by_stage']
 		self.effects = stats['effects']
+		self.attributes = stats['attributes']
+		self.attribute_names = stats['attribute_names']
+
 		
 		self.is_item = False
 		self.item_id = False
@@ -48,6 +51,8 @@ class Attack:
 				self.debuffs[key] = int(self.debuffs[key])
 			else:
 				self.debuffs[key] = float(self.debuffs[key])
+		for key in range(len(self.attributes)):
+			self.attributes[key] = int(self.attributes[key])
 
 
 	def __str__(self):
@@ -63,6 +68,9 @@ class Attack:
 			string += " [High Chance]"
 		if self.realm_requirement > 0:
 			string += " Realm Required: %s" % self.realm_requirement_name
+
+		if self.attribute_names:
+			string += " | Attributes: %s (%s)" % (", ".join(self.attribute_names), ", ".join(self.attributes))
 
 		has_buffs_by_stage = False
 		has_debuffs_by_stage = False
@@ -179,6 +187,7 @@ def create_last_resort_attack():
 		"damage_to_self": 0,
 		"damage_to_self_percent": 0.25,
 		"max_uses": 10,
+		"attributes": [],
 		"realm_requirement": 0,
 		"realm_requirement_name": "",
 		"buffs": {

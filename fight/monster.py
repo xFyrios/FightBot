@@ -17,6 +17,16 @@ class Monster:
 		self.max_health = self.set_max_health(int(stats['health']), self.level)
 		self.health = self.max_health
 		self.experience = int(stats['experience'])
+		self.attributes = stats['attributes']
+
+		for key in range(len(self.attributes['strengths'])):
+			self.attributes['strengths'][key] = int(self.attributes['strengths'][key])
+		for key in range(len(self.attributes['weaknesses'])):
+			self.attributes['weaknesses'][key] = int(self.attributes['weaknesses'][key])
+		for key in range(len(self.attributes['impervious'])):
+			self.attributes['impervious'][key] = int(self.attributes['impervious'][key])
+		for key in range(len(self.attributes['absorb'])):
+			self.attributes['absorb'][key] = int(self.attributes['absorb'][key])
 
 		self.stats_start = {
 			'attack': self.set_stat(int(stats['attack']), self.level),
@@ -77,6 +87,16 @@ class Monster:
 		if self.can_run:
 			attack_count += 1
 		string += " Health: %s(%d/%d)  Level: %d  XP: %d  |  Attack: %.1f  Defense: %.1f  Strength: %.1f  Accuracy: %.1f  Speed: %.1f  |  Loss Level: %d  Attack Count: %d" % (self.visual_health(False), self.health, self.max_health, self.level, self.experience, self.stats['attack'], self.stats['defense'], self.stats['strength'], self.stats['accuracy'], self.stats['speed'], self.loss_level, attack_count)
+
+		if self.attributes['strengths']:
+			string += " | Strengths (Attr): %s (%s)" % (", ".join(self.attributes['strength_names']), ", ".join(str(x) for x in self.attributes['strengths']))
+		if self.attributes['weaknesses']:
+			string += " | Weaknesses (Attr): %s (%s)" % (", ".join(self.attributes['weakness_names']), ", ".join(str(x) for x in self.attributes['weaknesses']))
+		if self.attributes['impervious']:
+			string += " | Impervious (Attr): %s (%s)" % (", ".join(self.attributes['impervious_names']), ", ".join(str(x) for x in self.attributes['impervious']))
+		if self.attributes['absorb']:
+			string += " | Absorbed (Attr): %s (%s)" % (", ".join(self.attributes['absorb_names']), ", ".join(str(x) for x in self.attributes['absorb']))
+
 		if self.effects:
 			string += " | Status Ailments: %s" % (", ".join(self.effects.keys()))
 		string += "  |  Rewards: %s" % self.rewards
@@ -105,6 +125,19 @@ class Monster:
 			phenny.say("%s Element: %s" % (self.announce_prepend(), self.element_type_name))
 		string = "%s Attack: %.1f  Defense: %.1f  Strength: %.1f  Accuracy: %.1f  Speed: %.1f" % (self.announce_prepend(), self.stats['attack'], self.stats['defense'], self.stats['strength'], self.stats['accuracy'], self.stats['speed'])
 		phenny.say(string)
+
+		string = ""
+		if self.attributes['strengths']:
+			string += "Strengths: %s (%s) " % (", ".join(self.attributes['strength_names']), ", ".join(str(x) for x in self.attributes['strengths']))
+		if self.attributes['weaknesses']:
+			string += "Weaknesses: %s (%s) " % (", ".join(self.attributes['weakness_names']), ", ".join(str(x) for x in self.attributes['weaknesses']))
+		if self.attributes['impervious']:
+			string += "Impervious: %s (%s) " % (", ".join(self.attributes['impervious_names']), ", ".join(str(x) for x in self.attributes['impervious']))
+		if self.attributes['absorb']:
+			string += "Absorbed: %s (%s) " % (", ".join(self.attributes['absorb_names']), ", ".join(str(x) for x in self.attributes['absorb']))
+		if string:
+			phenny.say(string)
+
 		if self.effects:
 			phenny.say("%s Status Ailments: %s" % (self.announce_prepend(), ", ".join(self.effects.keys())))
 
@@ -501,7 +534,7 @@ def get_monster_stats(phenny, monsterid, username):
 		'element_type_name', 'fast', 'health',
 		'experience', 'level_start', 'level_end',
 		'attack', 'defense', 'strength', 'accuracy',
-		'speed', 'loss_level', 'rewards', 'can_run'))
+		'speed', 'loss_level', 'rewards', 'can_run', 'attributes'))
 
 	if len(site['attacks']) > 4:
 		attacks = sample(site['attacks'], 4)
