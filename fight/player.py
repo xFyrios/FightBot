@@ -225,21 +225,39 @@ class Player:
 			if attack.is_critical_hit(self.stats['strength']):
 				damage = floor(damage * attack.critical_multiplier)
 				phenny.say("%s It was a critical hit!" % self.announce_prepend())
-			# Element strengths/weaknesses
-			if attack.is_strong_against(monster.element_type):
-				damage *= 2
+			# Attribute strengths/weaknesses & STAB
+			modifier = attack.get_attribute_modifier(self, monster)
+			damage = floor(damage * modifier)
+			if modifier > 2:
+				phenny.say("%s It was extremely effective!" % self.announce_prepend())
+			elif modifier > 1.5:
 				phenny.say("%s It was super effective!" % self.announce_prepend())
-			elif attack.is_strong_against(monster.element_type):
-				damage = floor(damage / 2)
+			elif modifier > 1:
+				phenny.say("%s It was very effective!" % self.announce_prepend())
+			elif modifier < 0.5 and modifier > 0:
+				phenny.say("%s It was extremely ineffective." % self.announce_prepend())
+			elif modifier < 1 and modifier > 0:
 				phenny.say("%s It was not very effective." % self.announce_prepend())
-			# Damage randomizer
-			random_int = (float(randint(85,100)) / 100)
-			damage = floor(damage * random_int)
-			if damage > 0:
-				monster.health -= damage
-				if monster.health < 0:
-					monster.health = 0
-				phenny.say('%s %d damage was done to the %s!' % (self.announce_prepend(), damage, monster.name))
+			elif modifier == 0:
+				phenny.say("%s The %s is impervious to your attack!" % (self.announce_prepend(), monster.name))
+			elif modifier < 0:
+				phenny.say("%s The %s absorbed your attack." % (self.announce_prepend(), monster.name))
+			
+			if modifier != 0:
+				# Damage randomizer
+				random_int = (float(randint(85,100)) / 100)
+				damage = floor(damage * random_int)
+				if damage > 0:
+					monster.health -= damage
+					if monster.health < 0:
+						monster.health = 0
+					phenny.say('%s %d damage was done to the %s!' % (self.announce_prepend(), damage, monster.name))
+				elif damage < 0:
+					monster.health -= damage
+					monster.health = min(monster.health, monster.max_health)
+					phenny.say('%s The %s gained %d health!' % (self.announce_prepend(), monster.name, damage * -1))
+				else:
+					no_damage = True
 			else:
 				no_damage = True
 		else:

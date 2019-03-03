@@ -134,29 +134,41 @@ class Attack:
 			threshold *= 6
 		return randint(0, 30) < threshold
 
-	def is_strong_against(self, target_element):
-		"""Test if an attacks element is strong against target element"""
-		# Water > Fire > Earth > Wind > Water
-		if self.element_type == 0 or target_element == 0:
-			return False
-		if (self.element_type, target_element) in (
-					(ELEM_WATER, ELEM_FIRE),
-					(ELEM_FIRE, ELEM_EARTH),
-					(ELEM_EARTH, ELEM_WIND),
-					(ELEM_WIND, ELEM_WATER)):
-			return True
+	def get_attribute_modifier(self, attacker, target):
+		modifier = 1
+		impervious_attributes = []
 
-	def is_weak_against(self, target_element):
-		"""Test if an attacks element is weak against target element"""
-		# Water > Fire > Earth > Wind > Water
-		if self.element_type == 0 or target_element == 0:
-			return False
-		if (self.element_type, target_element) in (
-				(ELEM_WATER, ELEM_WIND),
-				(ELEM_FIRE, ELEM_WATER),
-				(ELEM_EARTH, ELEM_FIRE),
-				(ELEM_WIND, ELEM_EARTH)):
-			return True
+		# Impervious
+		if 'impervious' in target.attributes and target.attributes['impervious']:
+			impervious_attributes = intersect(self.attributes, target.attributes['impervious'])
+			if len(impervious_attributes) > 0:
+				modifier = 0
+		# Strengths/Weaknesses but only if there are no more than 1 impervious attributes
+		# Also apply STAB strength / weakness boost
+		if len(impervious_attributes) <= 1:
+			if target.attributes['weaknesses']:
+				weakness_attributes = intersect(self.attributes, target.attributes['weaknesses'])
+				modifier += len(weakness_attributes)
+			if attacker.attributes['strengths']:
+				stab_strengths = intersect(self.attributes, attacker.attributes['strengths'])
+				if len(stab_strengths) > 0:
+					modifier += 0.35
+			if target.attributes['strengths']:
+				strength_attributes = intersect(self.attributes, target.attributes['strengths'])
+				modifier -= 0.45 * len(strength_attributes)
+			if attacker.attributes['weaknesses']:
+				stab_weaknesses = intersect(self.attributes, attacker.attributes['weaknesses'])
+				if len(stab_weaknesses) > 0:
+					modifier -= 0.25
+			modifier = max(0, modifier)
+		# Abosrb
+		if 'absorb' in target.attributes and target.attributes['absorb']:
+			absorb_attributes = intersect(self.attributes, target.attributes['absorb'])
+			modifier -= 2 * len(absorb_attributes)
+
+		modifier = max(-2, modifier)
+		modifier = min(3, modifier)
+		return modifier
 
 
 # BASIC FUNCTIONS
@@ -235,6 +247,10 @@ def create_last_resort_attack():
 	}
 	new_attack = Attack(stats)
 	return new_attack
+
+# HELPER FUNCTIONS
+def intersect(lst1, lst2):
+	return list(set(lst1) & set(lst2))
 
 if __name__ == '__main__':
     print(__doc__)
