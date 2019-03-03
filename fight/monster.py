@@ -89,13 +89,13 @@ class Monster:
 		string += " Health: %s(%d/%d)  Level: %d  XP: %d  |  Attack: %.1f  Defense: %.1f  Strength: %.1f  Accuracy: %.1f  Speed: %.1f  |  Loss Level: %d  Attack Count: %d" % (self.visual_health(False), self.health, self.max_health, self.level, self.experience, self.stats['attack'], self.stats['defense'], self.stats['strength'], self.stats['accuracy'], self.stats['speed'], self.loss_level, attack_count)
 
 		if self.attributes['strengths']:
-			string += " | Strengths (Attr): %s (%s)" % (", ".join(self.attributes['strength_names']), ", ".join(str(x) for x in self.attributes['strengths']))
+			string += " | Strengths (Attr): %s" % (", ".join(self.attributes['strength_names']))
 		if self.attributes['weaknesses']:
-			string += " | Weaknesses (Attr): %s (%s)" % (", ".join(self.attributes['weakness_names']), ", ".join(str(x) for x in self.attributes['weaknesses']))
+			string += " | Weaknesses (Attr): %s" % (", ".join(self.attributes['weakness_names']))
 		if self.attributes['impervious']:
-			string += " | Impervious (Attr): %s (%s)" % (", ".join(self.attributes['impervious_names']), ", ".join(str(x) for x in self.attributes['impervious']))
+			string += " | Impervious (Attr): %s" % (", ".join(self.attributes['impervious_names']))
 		if self.attributes['absorb']:
-			string += " | Absorbed (Attr): %s (%s)" % (", ".join(self.attributes['absorb_names']), ", ".join(str(x) for x in self.attributes['absorb']))
+			string += " | Absorbed (Attr): %s" % (", ".join(self.attributes['absorb_names']))
 
 		if self.effects:
 			string += " | Status Ailments: %s" % (", ".join(self.effects.keys()))
@@ -128,13 +128,13 @@ class Monster:
 
 		string = ""
 		if self.attributes['strengths']:
-			string += "Strengths: %s (%s) " % (", ".join(self.attributes['strength_names']), ", ".join(str(x) for x in self.attributes['strengths']))
+			string += "Strengths: %s " % (", ".join(self.attributes['strength_names']))
 		if self.attributes['weaknesses']:
-			string += "Weaknesses: %s (%s) " % (", ".join(self.attributes['weakness_names']), ", ".join(str(x) for x in self.attributes['weaknesses']))
+			string += "Weaknesses: %s " % (", ".join(self.attributes['weakness_names']))
 		if self.attributes['impervious']:
-			string += "Impervious: %s (%s) " % (", ".join(self.attributes['impervious_names']), ", ".join(str(x) for x in self.attributes['impervious']))
+			string += "Impervious: %s " % (", ".join(self.attributes['impervious_names']))
 		if self.attributes['absorb']:
-			string += "Absorbed: %s (%s) " % (", ".join(self.attributes['absorb_names']), ", ".join(str(x) for x in self.attributes['absorb']))
+			string += "Absorbed: %s " % (", ".join(self.attributes['absorb_names']))
 		if string:
 			phenny.say(string)
 

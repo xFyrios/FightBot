@@ -78,9 +78,9 @@ class Player:
 			string += "  Element: %s" % self.element_type_name
 		string += "  Health: %s(%d/%d)  Level: %d  XP: %d  |  Attack: %.1f  Defense: %.1f  Strength: %.1f  Accuracy: %.1f  Speed: %.1f  |  Attack Count: %d | Item Count: %d" % (self.visual_health(False), self.health, self.max_health, self.level, self.experience, self.stats['attack'], self.stats['defense'], self.stats['strength'], self.stats['accuracy'], self.stats['speed'], len(self.attacks), len(self.items))
 		if self.attributes['strengths']:
-			string += " | Strengths (Attr): %s (%s)" % (", ".join(self.attributes['strength_names']), ", ".join(str(x) for x in self.attributes['strengths']))
+			string += " | Strengths (Attr): %s" % (", ".join(self.attributes['strength_names']))
 		if self.attributes['weaknesses']:
-			string += " | Weaknesses (Attr): %s (%s)" % (", ".join(self.attributes['weakness_names']), ", ".join(str(x) for x in self.attributes['weaknesses']))
+			string += " | Weaknesses (Attr): %s" % (", ".join(self.attributes['weakness_names']))
 		if self.effects:
 			string += " | Status Ailments: %s" % (", ".join(self.effects.keys()))
 		if self.ghost:
@@ -108,9 +108,9 @@ class Player:
 
 		string = ""
 		if self.attributes['strengths']:
-			string += "Strengths: %s (%s) " % (", ".join(self.attributes['strength_names']), ", ".join(str(x) for x in self.attributes['strengths']))
+			string += "Strengths: %s " % (", ".join(self.attributes['strength_names']))
 		if self.attributes['weaknesses']:
-			string += "Weaknesses: %s (%s) " % (", ".join(self.attributes['weakness_names']), ", ".join(str(x) for x in self.attributes['weaknesses']))
+			string += "Weaknesses: %s " % (", ".join(self.attributes['weakness_names']))
 		if string:
 			phenny.say(string)
 
