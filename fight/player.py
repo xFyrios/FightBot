@@ -108,7 +108,7 @@ class Player:
 
 		string = ""
 		if self.attributes['strengths']:
-			string += "Strengths: %s " % (", ".join(self.attributes['strength_names']))
+			string += "Strengths: %s | " % (", ".join(self.attributes['strength_names']))
 		if self.attributes['weaknesses']:
 			string += "Weaknesses: %s " % (", ".join(self.attributes['weakness_names']))
 		if string:

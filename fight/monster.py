@@ -130,10 +130,16 @@ class Monster:
 		if self.attributes['strengths']:
 			string += "Strengths: %s " % (", ".join(self.attributes['strength_names']))
 		if self.attributes['weaknesses']:
+			if self.attributes['strengths']:
+				string += "| "
 			string += "Weaknesses: %s " % (", ".join(self.attributes['weakness_names']))
 		if self.attributes['impervious']:
+			if self.attributes['strengths'] or self.attributes['weaknesses']:
+				string += "| "
 			string += "Impervious: %s " % (", ".join(self.attributes['impervious_names']))
 		if self.attributes['absorb']:
+			if self.attributes['strengths'] or self.attributes['weaknesses'] or self.attributes['absorb']:
+				string += "| "
 			string += "Absorbed: %s " % (", ".join(self.attributes['absorb_names']))
 		if string:
 			phenny.say(string)
