@@ -650,11 +650,13 @@ def end_fight(phenny, userid):
 			#if drops and 'msg' in drops:
 				#phenny.say("%s%s" % (etx, drops['msg']))
 			experience = player.calculate_experience_gain(monster)
-			new_level = floor((player.experience + experience) ** (1. / 3))
 			phenny.say("%sYou gained %d experience." % (etx, experience))
-			phenny.callGazelleApi({'userid': userid, 'experience': experience, 'action': 'fightAddExperience'})
-			if new_level > player.level:
-				phenny.say("%sLevel up! You grew to level %d!" % (etx, new_level))
+			new_level_response = phenny.callGazelleApi({'userid': userid, 'experience': experience, 'action': 'fightAddExperience'})
+
+			if new_level_response['status'] == 'ok':
+				new_level = new_level_response['msg']
+				if new_level > player.level:
+					phenny.say("%sLevel up! You grew to level %d!" % (etx, new_level))
 		if not player.ghost:
 			phenny.callGazelleApi({'userid': userid, 'health': player.health, 'action': 'fightSetHealth'})
 		phenny.say("The fight between %s and the %s has ended." % (player.site_username, monster.name))
