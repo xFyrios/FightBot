@@ -662,7 +662,7 @@ def end_fight(phenny, userid):
 
 		if player.health <= 0: # if player lost
 			# TODO: Enable losses when ready to go live
-			#lose_response = phenny.callGazelleApi({'userid': userid, 'monsterid': monster.id, 'action': 'fightLosses'})
+			lose_response = phenny.callGazelleApi({'userid': userid, 'monsterid': monster.id, 'action': 'fightLosses'})
 			#if lose_response['status'] == 'ok':
 				#phenny.say("%s%s" % (etx, lose_response['msg']))
 		if not player.ghost:
