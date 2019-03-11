@@ -174,7 +174,7 @@ class Player:
 			else:
 				string = " %d - %s [!attack %d]" % (i, attack.display_attack_option(), i)
 			phenny.write(('NOTICE', username + string))
-		if len(self.items) > 0:
+		if len(self.items) > 0 and 'Embargo' not in self.effects:
 			phenny.write(('NOTICE', username + " %d - Use an item [!items]" % (i+1)))
 			i += 1
 		if 'CantEscape' not in self.effects:

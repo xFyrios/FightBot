@@ -256,6 +256,9 @@ def item(phenny, input):
 			player = ongoing_fights[input.uid]['player']
 			if item_id > 0 and item_id in player.items.keys() and player.items[item_id]:
 				attack = player.items[item_id]
+				if 'Embargo' in player.effects:
+					phenny.write(('NOTICE', input.nick + " You have been blocked from using items!"))
+					return False
 				if attack.realm_requirement > 0 and current_realm.id != attack.realm_requirement:
 					phenny.write(('NOTICE', input.nick + " That item cannot be used in this realm! It will only work in the %s realm." % attack.realm_requirement_name))
 					return False
