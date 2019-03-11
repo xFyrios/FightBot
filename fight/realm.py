@@ -40,10 +40,12 @@ class Realm:
 			success = phenny.callGazelleApi({'action': 'huntCost', 'userid': userid, 'cost': self.hunt_cost})
 			if not success or 'status' not in success:
 				phenny.write(('NOTICE', username + ' Something went wrong and your exploration failed.'))
+				return False
 			elif success['status'] == 'ok':
 				phenny.write(('NOTICE', username + ' You were charged ' + str(self.hunt_cost) + ' gold for your exploration.'))
 			elif 'error' in success:
 				phenny.write(('NOTICE', username + ' Error: ' + success['error']))
+				return False
 			else:
 				phenny.write(('NOTICE', username + ' Something went wrong and your exploration failed.'))
 				return False
