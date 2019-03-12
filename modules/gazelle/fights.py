@@ -129,7 +129,8 @@ def explore(phenny, input):
 				'player': player,
 				'monster': monster,
 				'data': {
-					'round': 0
+					'round': 0,
+					'realm_level': current_realm.level
 				}
 			}
 
@@ -648,9 +649,10 @@ def end_fight(phenny, userid):
 
 		if player.health > 0 and monster.health <= 0: # if player won
 			# TODO: Enable rewards when ready to go live
-			#drops = phenny.callGazelleApi({'action': 'fightReward', 'userid': player.uid, 'monsterid': monster.id})
-			#if drops and 'msg' in drops:
-				#phenny.say("%s%s" % (etx, drops['msg']))
+			if player.level <= (ongoing_fights[userid]['data']['realm_level'] + 20):
+				drops = phenny.callGazelleApi({'action': 'fightReward', 'userid': player.uid, 'monsterid': monster.id})
+				#if drops and 'msg' in drops:
+					#phenny.say("%s%s" % (etx, drops['msg']))
 			experience = player.calculate_experience_gain(monster)
 			phenny.say("%sYou gained %d experience." % (etx, experience))
 			new_level_response = phenny.callGazelleApi({'userid': userid, 'experience': experience, 'action': 'fightAddExperience'})
