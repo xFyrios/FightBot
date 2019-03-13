@@ -222,7 +222,7 @@ class Player:
 			damage = floor(damage * attack.damage_base * max(self.stats['attack'], 1) / max(monster.stats['defense'], 1))
 			damage = floor(damage / 50) + 2
 			# Critical hit
-			if attack.is_critical_hit(self.stats['strength']):
+			if attack.is_critical_hit(self.stats['strength'], monster.level):
 				damage = floor(damage * attack.critical_multiplier)
 				phenny.say("%s It was a critical hit!" % self.announce_prepend())
 			# Attribute strengths/weaknesses & STAB

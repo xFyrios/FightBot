@@ -128,11 +128,11 @@ class Attack:
 		string = "%s (%d/%d)" % (self.name, self.uses, self.max_uses)
 		return string
 
-	def is_critical_hit(self, strength):
+	def is_critical_hit(self, strength, level):
 		threshold = strength
 		if self.high_critical_chance:
 			threshold *= 6
-		return randint(0, 30) < threshold
+		return randint(0, level * 10) < threshold
 
 	def get_attribute_modifier(self, attacker, target):
 		modifier = 1
