@@ -648,11 +648,10 @@ def end_fight(phenny, userid):
 			phenny.say("%sThe %s died! You win the battle!" % (etx, monster.name))
 
 		if player.health > 0 and monster.health <= 0: # if player won
-			# TODO: Enable rewards when ready to go live
 			if player.level <= (ongoing_fights[userid]['data']['realm_level'] + 20):
 				drops = phenny.callGazelleApi({'action': 'fightReward', 'userid': player.uid, 'monsterid': monster.id})
-				#if drops and 'msg' in drops:
-					#phenny.say("%s%s" % (etx, drops['msg']))
+				if drops and 'msg' in drops:
+					phenny.say("%s%s" % (etx, drops['msg']))
 			experience = player.calculate_experience_gain(monster)
 			phenny.say("%sYou gained %d experience." % (etx, experience))
 			new_level_response = phenny.callGazelleApi({'userid': userid, 'experience': experience, 'action': 'fightAddExperience'})
@@ -663,10 +662,9 @@ def end_fight(phenny, userid):
 					phenny.say("%sLevel up! You grew to level %d!" % (etx, new_level))
 
 		if player.health <= 0: # if player lost
-			# TODO: Enable losses when ready to go live
 			lose_response = phenny.callGazelleApi({'userid': userid, 'monsterid': monster.id, 'action': 'fightLosses'})
-			#if lose_response['status'] == 'ok':
-				#phenny.say("%s%s" % (etx, lose_response['msg']))
+			if lose_response['status'] == 'ok':
+				phenny.say("%s%s" % (etx, lose_response['msg']))
 		if not player.ghost:
 			phenny.callGazelleApi({'userid': userid, 'health': player.health, 'action': 'fightSetHealth'})
 		phenny.say("The fight between %s and the %s has ended." % (player.site_username, monster.name))
