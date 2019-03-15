@@ -479,14 +479,19 @@ def do_player_attack(phenny, attack, userid, username, first_turn = False):
 	if attack.is_item:
 		item_id = attack.item_id
 		item_use = phenny.callGazelleApi({'action': 'fightUseItem', 'userid': player.uid, 'slotid': item_id})
-		if item_use['status'] == 'ok':
-			phenny.say("%s %s used %s (item)." % (player.announce_prepend(), player.site_username, attack.name))
-			del player.items[item_id]
-		else:
+		if not item_use or 'status' not in item_use:
+			phenny.write(('NOTICE', username + " An error occurred trying to use that item."))
+			attack = player.choose_auto_attack(current_realm.get_id())
+			phenny.say("%s %s failed to use their item. Used %s instead." % (player.announce_prepend(), player.site_username, attack.name))
+			attack.uses += 1
+		elif item_use['status'] == "error":
 			phenny.write(('NOTICE', username + " Error: " + item_use['error']))
 			attack = player.choose_auto_attack(current_realm.get_id())
 			phenny.say("%s %s failed to use their item. Used %s instead." % (player.announce_prepend(), player.site_username, attack.name))
 			attack.uses += 1
+		elif item_use['status'] == 'ok':
+			phenny.say("%s %s used %s (item)." % (player.announce_prepend(), player.site_username, attack.name))
+			del player.items[item_id]
 	else:
 		phenny.say("%s %s used %s." % (player.announce_prepend(), player.site_username, attack.name))
 		attack.uses += 1
@@ -650,20 +655,26 @@ def end_fight(phenny, userid):
 		if player.health > 0 and monster.health <= 0: # if player won
 			if player.level <= (ongoing_fights[userid]['data']['realm_level'] + 20):
 				drops = phenny.callGazelleApi({'action': 'fightReward', 'userid': player.uid, 'monsterid': monster.id})
-				if drops and 'msg' in drops:
+				if not drops or 'status' not in drops or drops['status'] == "error":
+					phenny.write(('NOTICE', username + " An error occurred trying to process your rewards."))
+				elif drops and 'msg' in drops:
 					phenny.say("%s%s" % (etx, drops['msg']))
 			experience = player.calculate_experience_gain(monster)
 			phenny.say("%sYou gained %d experience." % (etx, experience))
 			new_level_response = phenny.callGazelleApi({'userid': userid, 'experience': experience, 'action': 'fightAddExperience'})
 
-			if new_level_response['status'] == 'ok':
+			if not new_level_response or 'status' not in new_level_response or new_level_response['status'] == "error":
+				phenny.write(('NOTICE', username + " An error occurred updating your XP."))
+			elif new_level_response['status'] == 'ok':
 				new_level = new_level_response['msg']
 				if new_level > player.level:
 					phenny.say("%sLevel up! You grew to level %d!" % (etx, new_level))
 
 		if player.health <= 0: # if player lost
 			lose_response = phenny.callGazelleApi({'userid': userid, 'monsterid': monster.id, 'action': 'fightLosses'})
-			if lose_response['status'] == 'ok':
+			if not lose_response or 'status' not in lose_response or lose_response['status'] == "error":
+				phenny.write(('NOTICE', username + " An error occurred trying to process your losses."))
+			elif lose_response['status'] == 'ok':
 				phenny.say("%s%s" % (etx, lose_response['msg']))
 		if not player.ghost:
 			phenny.callGazelleApi({'userid': userid, 'health': player.health, 'action': 'fightSetHealth'})
