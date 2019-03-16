@@ -661,7 +661,7 @@ def end_fight(phenny, userid):
 			if player.level <= (ongoing_fights[userid]['data']['realm_level'] + 20):
 				drops = phenny.callGazelleApi({'action': 'fightReward', 'userid': player.uid, 'monsterid': monster.id})
 				if not drops or 'status' not in drops or drops['status'] == "error":
-					phenny.write(('NOTICE', player.username + " An error occurred trying to process your rewards."))
+					phenny.write(('NOTICE', player.site_username + " An error occurred trying to process your rewards."))
 				elif drops and 'msg' in drops:
 					phenny.say("%s%s" % (etx, drops['msg']))
 			experience = player.calculate_experience_gain(monster)
@@ -669,7 +669,7 @@ def end_fight(phenny, userid):
 			new_level_response = phenny.callGazelleApi({'userid': userid, 'experience': experience, 'action': 'fightAddExperience'})
 
 			if not new_level_response or 'status' not in new_level_response or new_level_response['status'] == "error":
-				phenny.write(('NOTICE', player.username + " An error occurred updating your XP."))
+				phenny.write(('NOTICE', player.site_username + " An error occurred updating your XP."))
 			elif new_level_response['status'] == 'ok' and 'msg' in new_level_response:
 				new_level = new_level_response['msg']
 				if new_level > player.level:
@@ -678,7 +678,7 @@ def end_fight(phenny, userid):
 		if player.health <= 0: # if player lost
 			lose_response = phenny.callGazelleApi({'userid': userid, 'monsterid': monster.id, 'action': 'fightLosses'})
 			if not lose_response or 'status' not in lose_response or lose_response['status'] == "error":
-				phenny.write(('NOTICE', player.username + " An error occurred trying to process your losses."))
+				phenny.write(('NOTICE', player.site_username + " An error occurred trying to process your losses."))
 			elif lose_response['status'] == 'ok' and 'msg' in lose_response:
 				phenny.say("%s%s" % (etx, lose_response['msg']))
 		if not player.ghost:
