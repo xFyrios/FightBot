@@ -665,7 +665,7 @@ def end_fight(phenny, userid):
 
 			if not new_level_response or 'status' not in new_level_response or new_level_response['status'] == "error":
 				phenny.write(('NOTICE', username + " An error occurred updating your XP."))
-			elif new_level_response['status'] == 'ok':
+			elif new_level_response['status'] == 'ok' and 'msg' in new_level_response:
 				new_level = new_level_response['msg']
 				if new_level > player.level:
 					phenny.say("%sLevel up! You grew to level %d!" % (etx, new_level))
@@ -674,7 +674,7 @@ def end_fight(phenny, userid):
 			lose_response = phenny.callGazelleApi({'userid': userid, 'monsterid': monster.id, 'action': 'fightLosses'})
 			if not lose_response or 'status' not in lose_response or lose_response['status'] == "error":
 				phenny.write(('NOTICE', username + " An error occurred trying to process your losses."))
-			elif lose_response['status'] == 'ok':
+			elif lose_response['status'] == 'ok' and 'msg' in lose_response:
 				phenny.say("%s%s" % (etx, lose_response['msg']))
 		if not player.ghost:
 			phenny.callGazelleApi({'userid': userid, 'health': player.health, 'action': 'fightSetHealth'})
