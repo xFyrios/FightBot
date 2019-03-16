@@ -199,7 +199,8 @@ def create_last_resort_attack():
 		"damage_to_self": 0,
 		"damage_to_self_percent": 0.25,
 		"max_uses": 10,
-		"attributes": [],
+		"attributes": [5],
+		"attribute_names": ["Brute"],
 		"realm_requirement": 0,
 		"realm_requirement_name": "",
 		"buffs": {
