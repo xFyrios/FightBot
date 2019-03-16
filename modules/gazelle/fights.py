@@ -612,9 +612,12 @@ def create_new_realm(phenny):
 		current_realmid = current_realm.get_id()
 	if lock_realm == False or current_realmid == False:
 		new_realm_info = phenny.callGazelleApi({'action': 'randomRealm', 'current_realm': current_realmid})
-		current_realm = False
-		current_realm = fight.realm.create(new_realm_info['ID'], new_realm_info['Name'], new_realm_info['Level'], new_realm_info['HuntCost'], new_realm_info['Monsters'])
-		current_realm.announce(phenny)
+		if not new_realm_info or 'status' not in new_realm_info or new_realm_info['status'] == "error":
+			return False
+		else:
+			current_realm = False
+			current_realm = fight.realm.create(new_realm_info['ID'], new_realm_info['Name'], new_realm_info['Level'], new_realm_info['HuntCost'], new_realm_info['Monsters'])
+			current_realm.announce(phenny)
 	else:
 		phenny.say("The guide tried to move to a new realm but was blocked by staff!")
 	Timer(REALM_CYCLE, create_new_realm, [phenny]).start()
@@ -626,6 +629,8 @@ def set_new_realm(phenny, mod, realmid):
 	if realmid.isdigit():
 		if mod:
 			new_realm_info = phenny.callGazelleApi({'action': 'getRealm', 'realmid': realmid})
+			if not new_realm_info or 'status' not in new_realm_info or new_realm_info['status'] == "error":
+				return False
 			if new_realm_info['status'] == 'ok':
 				game_started = True
 				current_realm = False
