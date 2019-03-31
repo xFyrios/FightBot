@@ -151,8 +151,8 @@ def explore(phenny, input):
 			if in_fight_quiet(input.uid):
 				player.can_attack = True
 				player.attack_options(phenny, username)
-				player.attack_timer = Timer(ATTACK_TIMEOUT, force_attack, [phenny, input])
-				player.attack_timer.start()
+				# player.attack_timer = Timer(ATTACK_TIMEOUT, force_attack, [phenny, input])
+				# player.attack_timer.start()
 explore.commands = ['explore', 'hunt']
 explore.priority = 'low'
 explore.example = '!explore'
@@ -275,8 +275,8 @@ def item(phenny, input):
 							phenny.write(('NOTICE', input.nick + " An error occurred."))
 						elif item_can_use['status'] == "error":
 							phenny.write(('NOTICE', input.nick + " Error: " + item_can_use['error']))
-						player.attack_timer = Timer(ATTACK_TIMEOUT, force_attack, [phenny, input])
-						player.attack_timer.start()
+						# player.attack_timer = Timer(ATTACK_TIMEOUT, force_attack, [phenny, input])
+						# player.attack_timer.start()
 						player.can_attack = True
 					else:
 						attack.item_id = item_id
@@ -354,8 +354,8 @@ def do_round_moves(phenny, input, player_attack):
 			phenny.say(player.display_health())
 			phenny.say(monster.display_health())
 			player.attack_options(phenny, input.nick)
-			player.attack_timer = Timer(ATTACK_TIMEOUT, force_attack, [phenny, input])
-			player.attack_timer.start()
+			# player.attack_timer = Timer(ATTACK_TIMEOUT, force_attack, [phenny, input])
+			# player.attack_timer.start()
 			player.can_attack = True
 
 # Perform attacks/runs with the player going first. Called by the do_round_moves function.
