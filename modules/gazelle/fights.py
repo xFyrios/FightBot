@@ -658,7 +658,7 @@ def end_fight(phenny, userid):
 			phenny.say("%sThe %s died! You win the battle!" % (etx, monster.name))
 
 		if player.health > 0 and monster.health <= 0: # if player won
-			if player.level <= (ongoing_fights[userid]['data']['realm_level'] + 20):
+			if player.level <= (ongoing_fights[userid]['data']['realm_level'] + 30):
 				drops = phenny.callGazelleApi({'action': 'fightReward', 'userid': player.uid, 'monsterid': monster.id})
 				if not drops or 'status' not in drops or drops['status'] == "error":
 					phenny.write(('NOTICE', player.site_username + " An error occurred trying to process your rewards."))
