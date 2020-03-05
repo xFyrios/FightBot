@@ -68,7 +68,7 @@ def startup(phenny, input):
 	# Join the channels on our account
 	channels = phenny.config.channels
 	for c in channels:
-		phenny.write(('JOIN', '#' + c))
+		phenny.write(('SAJOIN', phenny.config.nick + ' #' + c))
 		time.sleep(0.5)
 startup.rule = r'(.*)'
 startup.event = '251'
