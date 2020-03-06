@@ -121,7 +121,7 @@ def unopen_realm(phenny, input):
 
 	if input.mod and game_started:
 		open_realm = False
-		phenny.write("Users will no longer be able to change the realm.")
+		phenny.say("Users will no longer be able to change the realm.")
 unopen_realm.commands = ['unopenrealm', 'realmunopen']
 unopen_realm.priority = 'low'
 unopen_realm.example = '!unopenrealm'
