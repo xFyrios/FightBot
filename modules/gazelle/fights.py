@@ -110,7 +110,7 @@ def open_realm(phenny, input):
 
 	if input.mod and game_started:
 		open_realm = True
-		phenny.write(('NOTICE', input.nick + " The channel has been opened to user realm changes."))
+		phenny.say("The channel has been opened to user realm changes.")
 open_realm.commands = ['openrealm', 'realmopen']
 open_realm.priority = 'low'
 open_realm.example = '!openrealm'
@@ -121,7 +121,7 @@ def unopen_realm(phenny, input):
 
 	if input.mod and game_started:
 		open_realm = False
-		phenny.write(('NOTICE', input.nick + " Users will no longer be able to change the realm."))
+		phenny.write("Users will no longer be able to change the realm.")
 open_realm.commands = ['unopenrealm', 'realmunopen']
 open_realm.priority = 'low'
 open_realm.example = '!unopenrealm'
