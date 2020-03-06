@@ -11,13 +11,14 @@ ATTACK_TIMEOUT = 120 # How long a player has to choose an attack before a random
 
 game_started = False  # set to true after !start has been called
 current_realm = False  # holds the realm object
+open_realm = False # if True, users can user !setrealm to change the current realm to a new one
 lock_realm = False # if the realm has been blocked from auto cycling to a new one
 ongoing_fights = {} # holds the player and monster objects for ongoing fights. 
 					# The key for each fight is the users id, the value is another dictionary 
 					# with Player under key 'player', and Monster under 'monster':  {userid: {'player': Player, 'monster': Monster, 'data': {}}}
 					# 'data' can hold miscellaneous data such as the round #
 
-arguments = {'start': 0, 'setrealm': 1, 'realmlock': 0, 'realmunlock': 0, 'info': 0, 'fights': 0, 'explore': 0, 'stats': 0, 'run': 0, 'attack': 1, 'items': 0, 'item': 1}
+arguments = {'start': 0, 'setrealm': 1, 'openrealm': 0, 'unopenrealm': 0, 'realmlock': 0, 'realmunlock': 0, 'info': 0, 'fights': 0, 'explore': 0, 'stats': 0, 'run': 0, 'attack': 1, 'items': 0, 'item': 1}
 help = OrderedDict([('start', "If adventuring has not already begun, use !start to get the bot going."),
 					('info', "To get info on the current realm you are exploring, use the !info or !status command."),
 					('explore', "To attempt a hunt, use the command !explore or !hunt."),
@@ -28,7 +29,9 @@ help = OrderedDict([('start', "If adventuring has not already begun, use !start 
 					('item', "To attack a creature with an item use the command !item #, where # is the number of the item. Only works when you are in a fight."),
 					('run', "Attempt to !run from a monster. Only works when you are in a fight and it is your turn to attack."),
 					('fights', "Shows a list of all currently running fights and who is involved."),
-					('setrealm', "To change to a new realm, use !setrealm realmid. Only useable by mods."),
+					('setrealm', "To change to a new realm, use !setrealm realmid. Only useable by mods unless a mod has ran !openrealm."),
+					('openrealm', "Opens the bot to realm changes by users. Only useable by mods."),
+					('unopenrealm', "Unopens the bot to realm changes by users. Only useable by mods."),
 					('realmlock', "To stop the realm from changing once every %d hours, use !realmlock. To unlock it again, use !realmunlock. Only useable by mods." % REALM_CYCLE)])
 
 # Turn the system on
@@ -99,6 +102,28 @@ def set_realm(phenny, input):
 set_realm.commands = ['setrealm']
 set_realm.priority = 'low'
 set_realm.example = '!realm 1'
+
+# Opens the realm to user changes
+def open_realm(phenny, input):
+	global open_realm
+
+	if input.mod and game_started:
+		open_realm = True
+		phenny.write(('NOTICE', input.nick + " The channel has been opened to user realm changes."))
+open_realm.commands = ['openrealm', 'realmopen']
+open_realm.priority = 'low'
+open_realm.example = '!openrealm'
+
+# Unopens the realm to user changes
+def unopen_realm(phenny, input):
+	global open_realm
+
+	if input.mod and game_started:
+		open_realm = False
+		phenny.write(('NOTICE', input.nick + " Users will no longer be able to change the realm."))
+open_realm.commands = ['unopenrealm', 'realmunopen']
+open_realm.priority = 'low'
+open_realm.example = '!unopenrealm'
 
 # Lock the realm so it won't cycle
 def realm_lock(phenny, input):
@@ -645,7 +670,7 @@ def set_new_realm(phenny, mod, realmid):
 	global current_realm, game_started
 	
 	if realmid.isdigit():
-		if mod:
+		if mod or open_realm:
 			new_realm_info = phenny.callGazelleApi({'action': 'getRealm', 'realmid': realmid})
 			if not new_realm_info or 'status' not in new_realm_info or new_realm_info['status'] == "error":
 				return False
