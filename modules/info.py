@@ -7,38 +7,11 @@ Licensed under the Eiffel Forum License 2.
 http://inamidst.com/phenny/
 """
 
-def commands(phenny, input): 
-   '''Returns a list of commands I can undestand'''
-   # This function only works in private message
-   if input.sender.startswith('#'): return
-   names = ', '.join(sorted(phenny.doc.iterkeys()))
-   phenny.say('Commands I recognise: ' + names + '.')
-   phenny.say("For help, do '!help example' where example is the " + 
-               "name of the command you want help for.")
-commands.commands = ['commands']
-commands.priority = 'low'
-
-def help(phenny, input): 
-   '''Gives help in general, or for specific commands'''
-   if not input.group(2):
-      response = (
-         'Hi, I\'m '+ phenny.nick +'! Say "!commands" to me in a PM for a list ' + 
-         'of my commands. Or say "!help example" for help with a specific command.'
-      )
-      phenny.reply(response)
-   else:
-      name = input.group(2)
-      name = name.lower()
-
-      if phenny.doc.has_key(name): 
-         phenny.reply(phenny.doc[name][0])
-         if phenny.doc[name][1]: 
-            phenny.say('e.g. ' + phenny.doc[name][1])
-help.commands = ['help']
-help.priority = 'low'
-
 def stats(phenny, input): 
    """Show information on command usage patterns."""
+   # This function only works in private message
+   if input.sender.startswith('#'): return
+   
    commands = {}
    users = {}
    channels = {}

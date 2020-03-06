@@ -50,7 +50,7 @@ start.example = '!start'
 def fight_help(phenny, input):
     if not input.group(2):
         phenny.say('Commands I recognize include: ' + ', '.join(help.keys()))
-        phenny.say("For more info on a command, type '!fighthelp cmd' where cmd is the name of the command you want help for.")
+        phenny.say("For more info on a command, type '!help cmd' where cmd is the name of the command you want help for.")
     else:
         cmd = input.group(2)
         if cmd in help.keys():
@@ -58,9 +58,10 @@ def fight_help(phenny, input):
         else:
             phenny.say('That command does not exist.')
             phenny.say('Commands I recognize include: ' + ', '.join(help.keys()))
-fight_help.commands = ['fighthelp']
+fight_help.commands = ['help', 'fighthelp', 'commands']
 fight_help.priority = 'low'
-fight_help.example = '!fighthelp info'
+fight_help.example = '!help info'
+
 
 # Get info on the current realm
 def info(phenny, input):
