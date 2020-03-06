@@ -122,9 +122,9 @@ def unopen_realm(phenny, input):
 	if input.mod and game_started:
 		open_realm = False
 		phenny.write("Users will no longer be able to change the realm.")
-open_realm.commands = ['unopenrealm', 'realmunopen']
-open_realm.priority = 'low'
-open_realm.example = '!unopenrealm'
+unopen_realm.commands = ['unopenrealm', 'realmunopen']
+unopen_realm.priority = 'low'
+unopen_realm.example = '!unopenrealm'
 
 # Lock the realm so it won't cycle
 def realm_lock(phenny, input):
