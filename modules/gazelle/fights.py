@@ -17,7 +17,7 @@ ongoing_fights = {} # holds the player and monster objects for ongoing fights.
 					# with Player under key 'player', and Monster under 'monster':  {userid: {'player': Player, 'monster': Monster, 'data': {}}}
 					# 'data' can hold miscellaneous data such as the round #
 
-arguments = {'start': 0, 'setrealm': 1, 'realmlock': 0, 'realmunlock': 0, 'info': 0, 'explore': 0, 'stats': 0, 'run': 0, 'attack': 1, 'items': 0, 'item': 1}
+arguments = {'start': 0, 'setrealm': 1, 'realmlock': 0, 'realmunlock': 0, 'info': 0, 'fights': 0, 'explore': 0, 'stats': 0, 'run': 0, 'attack': 1, 'items': 0, 'item': 1}
 help = OrderedDict([('start', "If adventuring has not already begun, use !start to get the bot going."),
 					('info', "To get info on the current realm you are exploring, use the !info or !status command."),
 					('explore', "To attempt a hunt, use the command !explore or !hunt."),
@@ -27,6 +27,7 @@ help = OrderedDict([('start', "If adventuring has not already begun, use !start 
 					('attack', "To attack a creature use the command !attack #, where # is the number of the attack. Only works when you are in a fight."),
 					('item', "To attack a creature with an item use the command !item #, where # is the number of the item. Only works when you are in a fight."),
 					('run', "Attempt to !run from a monster. Only works when you are in a fight and it is your turn to attack."),
+					('fights', "Shows a list of all currently running fights and who is involved."),
 					('setrealm', "To change to a new realm, use !setrealm realmid. Only useable by mods."),
 					('realmlock', "To stop the realm from changing once every %d hours, use !realmlock. To unlock it again, use !realmunlock. Only useable by mods." % REALM_CYCLE)])
 
@@ -70,6 +71,23 @@ def info(phenny, input):
 info.commands = ['info', 'status']
 info.priority = 'low'
 info.example = '!info'
+
+# Get info on currently running fights
+def fights(phenny, input):
+	global game_started
+	if not game_started:
+		phenny.say("There is currently no adventure in progress. Use !start to get started.")
+	elif not ongoing_fights:
+		phenny.say("There are currently no fights running.")
+	else:
+		if len(ongoing_fights) > 1:
+			phenny.say("There are currently %d fights ongoing." % len(ongoing_fights))
+		else:
+			phenny.say("There is currently 1 fight ongoing.")
+		phenny.say("Fights: " + ', '.join(("%s vs. %s" % (fight['player'].name, fight['monster'].name)) for (key,fight) in ongoing_fights.items()))
+fights.commands = ['fights']
+fights.priority = 'low'
+fights.example = '!fights'
 
 
 # Set a new realm manually
