@@ -666,13 +666,16 @@ def create_new_realm(phenny):
 		phenny.say("The guide tried to move to a new realm but was blocked by staff!")
 	Timer(REALM_CYCLE, create_new_realm, [phenny]).start()
 
-# Let staff manually set a new realm
+# Let staff manually set a new realm or users if the realm is open
 def set_new_realm(phenny, mod, realmid):
 	global current_realm, game_started
 	
 	if realmid.isdigit():
 		if mod or open_realm:
-			new_realm_info = phenny.callGazelleApi({'action': 'getRealm', 'realmid': realmid})
+			if mod:
+				new_realm_info = phenny.callGazelleApi({'action': 'getRealm', 'realmid': realmid})
+			else:
+				new_realm_info = phenny.callGazelleApi({'action': 'getRealm', 'realmid': realmid, 'enabledonly': True})
 			if not new_realm_info or 'status' not in new_realm_info or new_realm_info['status'] == "error":
 				return False
 			if new_realm_info['status'] == 'ok':
