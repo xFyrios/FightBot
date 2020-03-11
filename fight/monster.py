@@ -277,7 +277,7 @@ class Monster:
 			effects_applied = self.apply_attack_effects(phenny, cur_round, attack.effects, player, first_turn)
 
 		if attack.element_type == a.ELEM_FIRE and 'Freezing' in player.effects:
-			phenny.say('%s You were thawed out by the hot attack!' % (self.announce_prepend(), player.site_username))
+			phenny.say('%s You were thawed out by the hot attack!' % (self.announce_prepend()))
 			del player.effects['Freezing']
 
 		if no_damage and not buffs_applied and not effects_applied and not restored_health:
