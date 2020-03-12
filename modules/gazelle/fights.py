@@ -675,7 +675,7 @@ def set_new_realm(phenny, mod, realmid):
 			if mod:
 				new_realm_info = phenny.callGazelleApi({'action': 'getRealm', 'realmid': realmid})
 			else:
-				new_realm_info = phenny.callGazelleApi({'action': 'getRealm', 'realmid': realmid, 'enabledonly': True})
+				new_realm_info = phenny.callGazelleApi({'action': 'getRealm', 'realmid': realmid, 'enabledonly': 'true'})
 			if not new_realm_info or 'status' not in new_realm_info or new_realm_info['status'] == "error":
 				return False
 			if new_realm_info['status'] == 'ok':
