@@ -34,6 +34,11 @@ help = OrderedDict([('start', "If adventuring has not already begun, use !start 
 					('unopenrealm', "Unopens the bot to realm changes by users. Only useable by mods."),
 					('realmlock', "To stop the realm from changing once every %d hours, use !realmlock. To unlock it again, use !realmunlock. Only useable by mods." % REALM_CYCLE)])
 
+#Used for creating an effectless timer at the start. Probably can be replaced by a less hacky thing.
+def dummy_func():
+	return
+realm_switch_timer = Timer(REALM_CYCLE, dummy_func)
+
 # Turn the system on
 def start(phenny, input):
 	global game_started
@@ -649,7 +654,7 @@ def do_effects_damage(phenny, userid):
 
 # Cycles to a new realm
 def create_new_realm(phenny):
-	global current_realm
+	global current_realm, realm_switch_timer
 
 	current_realmid = False
 	if current_realm:
@@ -664,11 +669,13 @@ def create_new_realm(phenny):
 			current_realm.announce(phenny)
 	else:
 		phenny.say("The guide tried to move to a new realm but was blocked by staff!")
-	Timer(REALM_CYCLE, create_new_realm, [phenny]).start()
+	realm_switch_timer.cancel()
+	realm_switch_timer = Timer(REALM_CYCLE, create_new_realm, [phenny])
+	realm_switch_timer.start()
 
 # Let staff manually set a new realm or users if the realm is open
 def set_new_realm(phenny, mod, realmid):
-	global current_realm, game_started
+	global current_realm, game_started, realm_switch_timer
 	
 	if realmid.isdigit():
 		if mod or open_realm:
@@ -683,7 +690,9 @@ def set_new_realm(phenny, mod, realmid):
 				current_realm = False
 				current_realm = fight.realm.create(realmid, new_realm_info['Name'], new_realm_info['Level'], new_realm_info['HuntCost'], new_realm_info['Monsters'])
 				current_realm.announce(phenny)
-				Timer(REALM_CYCLE, create_new_realm, [phenny]).start()
+				realm_switch_timer.cancel()
+				realm_switch_timer = Timer(REALM_CYCLE, create_new_realm, [phenny])
+				realm_switch_timer.start()
 			else:
 				phenny.say(new_realm_info['error'])
 		else:
