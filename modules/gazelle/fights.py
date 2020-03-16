@@ -7,7 +7,7 @@ from math import floor
 from threading import Timer
 
 REALM_CYCLE = 60 * 60 * 6  # How often to cycle to a new realm (6 hours)
-REALM_CYCLE_RETRY = 60 * 60
+REALM_CYCLE_RETRY = 60 * 60 # How long to wait before trying to cycle the realm again if callGazelleApi fails (1 hour)
 ATTACK_TIMEOUT = 120 # How long a player has to choose an attack before a random attack will be chosen for them
 
 game_started = False  # set to true after !start has been called
