@@ -115,8 +115,11 @@ def open_realm(phenny, input):
 	global open_realm
 
 	if input.mod and game_started:
-		open_realm = True
-		phenny.say("The channel has been opened to user realm changes.")
+		if open_realm:
+			phenny.say("Users were already able to change the realm.")
+		else:
+			open_realm = True
+			phenny.say("The channel has been opened to user realm changes.")
 open_realm.commands = ['openrealm', 'realmopen']
 open_realm.priority = 'low'
 open_realm.example = '!openrealm'
@@ -126,8 +129,11 @@ def unopen_realm(phenny, input):
 	global open_realm
 
 	if input.mod and game_started:
-		open_realm = False
-		phenny.say("Users will no longer be able to change the realm.")
+		if not open_realm:
+			phenny.say("Users were already unable to change the realm.")
+		else:
+			open_realm = False
+			phenny.say("Users will no longer be able to change the realm.")
 unopen_realm.commands = ['unopenrealm', 'realmunopen']
 unopen_realm.priority = 'low'
 unopen_realm.example = '!unopenrealm'
@@ -137,8 +143,11 @@ def realm_lock(phenny, input):
 	global lock_realm
 
 	if input.mod and game_started:
-		lock_realm = True
-		phenny.write(('NOTICE', input.nick + " Lock applied. The realm will no longer auto-cycle."))
+		if lock_realm:
+			phenny.write(('NOTICE', input.nick + " Lock already applied."))
+		else:
+			lock_realm = True
+			phenny.write(('NOTICE', input.nick + " Lock applied. The realm will no longer auto-cycle."))
 realm_lock.commands = ['realmlock', 'lockrealm']
 realm_lock.priority = 'low'
 realm_lock.example = '!realmlock'
@@ -148,8 +157,11 @@ def realm_unlock(phenny, input):
 	global lock_realm
 
 	if input.mod and game_started:
-		lock_realm = False
-		phenny.write(('NOTICE', input.nick + " Lock removed. The realm will once again auto-cycle."))
+		if not lock_realm:
+			phenny.write(('NOTICE', input.nick + " Lock already removed."))
+		else:
+			lock_realm = False
+			phenny.write(('NOTICE', input.nick + " Lock removed. The realm will once again auto-cycle."))
 realm_unlock.commands = ['realmunlock', 'unlockrealm']
 realm_unlock.priority = 'low'
 realm_unlock.example = '!realmunlock'
