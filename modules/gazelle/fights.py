@@ -7,6 +7,7 @@ from math import floor
 from threading import Timer
 
 REALM_CYCLE = 60 * 60 * 6  # How often to cycle to a new realm (6 hours)
+REALM_CYCLE_RETRY = 60 * 60
 ATTACK_TIMEOUT = 120 # How long a player has to choose an attack before a random attack will be chosen for them
 
 game_started = False  # set to true after !start has been called
@@ -662,6 +663,9 @@ def create_new_realm(phenny):
 	if lock_realm == False or current_realmid == False:
 		new_realm_info = phenny.callGazelleApi({'action': 'randomRealm', 'current_realm': current_realmid})
 		if not new_realm_info or 'status' not in new_realm_info or new_realm_info['status'] == "error":
+			realm_switch_timer.cancel()
+			realm_switch_timer = Timer(REALM_CYCLE_RETRY, create_new_realm, [phenny])
+			realm_switch_timer.start()
 			return False
 		else:
 			current_realm = False
