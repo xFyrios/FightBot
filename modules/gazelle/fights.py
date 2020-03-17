@@ -80,7 +80,7 @@ def info(phenny, input):
 		current_realm.info(phenny)
 		locked_text = "locked" if lock_realm else "unlocked"
 		opened_text = "be changed with '!setrealm #'." if open_realm else "not be changed by users."
-		realm_status_message = "The realm is currently %. The realm may %" % (locked_text, opened_text)
+		realm_status_message = "The realm is currently %s. The realm may %s" % (locked_text, opened_text)
 		phenny.say(realm_status_message)
 info.commands = ['info', 'status']
 info.priority = 'low'
