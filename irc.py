@@ -25,7 +25,7 @@ class Origin(object):
       self.sender = mappings.get(target, target)
 
 class Bot(asynchat.async_chat): 
-   def __init__(self, nick, name, channels, password=None): 
+   def __init__(self, nick, name, channels, advchan, password=None): 
       asynchat.async_chat.__init__(self)
       self.set_terminator('\n')
       self.buffer = ''
@@ -34,6 +34,7 @@ class Bot(asynchat.async_chat):
       self.user = nick
       self.name = name
       self.password = password
+	  self.advchan = advchan
 
       self.verbose = True
       self.channels = channels or []

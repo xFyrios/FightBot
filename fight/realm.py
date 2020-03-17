@@ -25,8 +25,11 @@ class Realm:
 		return self.color_realm_name(self.name, self.level)
 
 	def announce(self, phenny):
-		phenny.say("You have entered a new realm! Welcome to the %s." % self.colored_name)
-		phenny.say("Minimum Suggested Level: %d  Hunt Cost: %d" % (self.level, self.hunt_cost))
+		realm_name_info = "You have entered a new realm! Welcome to the %s." % self.colored_name
+		realm_level_info = "Minimum Suggested Level: %d  Hunt Cost: %d" % (self.level, self.hunt_cost)
+		phenny.write(('PRIVMSG', phenny.advchan + " " + realm_name_info))
+		phenny.write(('PRIVMSG', phenny.advchan + " " + realm_level_info))
+		return (realm_name_info, realm_level_info)
 
 	def info(self, phenny):
 		phenny.say("You are currently in the %s realm." % self.colored_name)

@@ -709,7 +709,10 @@ def set_new_realm(phenny, mod, realmid):
 				game_started = True
 				current_realm = False
 				current_realm = fight.realm.create(realmid, new_realm_info['Name'], new_realm_info['Level'], new_realm_info['HuntCost'], new_realm_info['Monsters'])
-				current_realm.announce(phenny)
+				realm_name_info, realm_level_info = current_realm.announce(phenny)
+				if not input.sender.startswith('#'):
+					phenny.say(realm_name_info)
+					phenny.say(realm_level_info)
 				realm_switch_timer.cancel()
 				realm_switch_timer = Timer(REALM_CYCLE, create_new_realm, [phenny])
 				realm_switch_timer.start()

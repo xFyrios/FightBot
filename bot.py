@@ -23,7 +23,7 @@ def decode(bytes):
 
 class Phenny(irc.Bot): 
    def __init__(self, config): 
-      args = (config.nick, config.name, config.channels, config.password)
+      args = (config.nick, config.name, config.channels, config.advchan, config.password)
       irc.Bot.__init__(self, *args)
       self.config = config
       self.doc = {}
