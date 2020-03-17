@@ -71,13 +71,17 @@ fight_help.example = '!help info'
 
 # Get info on the current realm
 def info(phenny, input):
-	global game_started
+	global game_started, lock_realm, open_realm
 	if not game_started:
 		phenny.say("There is currently no adventure in progress. Use !start to get started.")
 	elif not current_realm:
 		phenny.say("You are currently not in a realm. This should not be possible... I suggest you notify staff.")
 	else:
 		current_realm.info(phenny)
+		locked_text = "locked" if lock_realm else "unlocked"
+		opened_text = "be changed with '!setrealm #'." if open_realm else "not be changed by users."
+		realm_status_message = "The realm is currently %. The realm may %" % (locked_text, opened_text)
+		phenny.say(realm_status_message)
 info.commands = ['info', 'status']
 info.priority = 'low'
 info.example = '!info'
