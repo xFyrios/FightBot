@@ -18,8 +18,10 @@ ongoing_fights = {} # holds the player and monster objects for ongoing fights.
 					# The key for each fight is the users id, the value is another dictionary 
 					# with Player under key 'player', and Monster under 'monster':  {userid: {'player': Player, 'monster': Monster, 'data': {}}}
 					# 'data' can hold miscellaneous data such as the round #
+external_fights = [] # Fights happening in other bots
+fightbot_list = ["FightBot", "FightBot2", "FightBot3", "FightBot4"] # All FightBots
 
-arguments = {'start': 0, 'setrealm': 1, 'openrealm': 0, 'unopenrealm': 0, 'realmlock': 0, 'realmunlock': 0, 'info': 0, 'fights': 0, 'explore': 0, 'stats': 0, 'run': 0, 'attack': 1, 'items': 0, 'item': 1}
+arguments = {'start': 0, 'setrealm': 1, 'openrealm': 0, 'unopenrealm': 0, 'realmlock': 0, 'realmunlock': 0, 'info': 0, 'fights': 0, 'explore': 0, 'stats': 0, 'run': 0, 'attack': 1, 'items': 0, 'item': 1, 'share': 2}
 help = OrderedDict([('start', "If adventuring has not already begun, use !start to get the bot going."),
 					('info', "To get info on the current realm you are exploring, use the !info or !status command."),
 					('explore', "To attempt a hunt, use the command !explore or !hunt."),
@@ -174,11 +176,16 @@ realm_unlock.example = '!realmunlock'
 def explore(phenny, input):
 	if not game_started:
 		phenny.say("There is currently no adventure in progress. Use !start to get started.") 
-	elif input.uid in ongoing_fights:
-		phenny.say("You can't keep exploring... you are already in a fight!") 
+	elif input.uid in ongoing_fights or input.uid in external_fights:
+		phenny.say("You can't keep exploring... you are already in a fight!")
 	elif input.uid:
 		userid = input.uid
 		username = input.nick
+		share_player_info(phenny, userid, "start")
+		time.sleep(1)
+		if userid in external_fights:
+			phenny.say("You can't keep exploring... you are already in a fight!")
+			return False
 		monster_id = current_realm.explore(phenny, userid, username)
 		if monster_id:
 			# Create the player and monster objects, add them to the ongoing_fights dictionary
@@ -365,6 +372,19 @@ items.commands = ['items']
 items.priority = 'medium'
 items.example = '!items'
 
+def share(phenny, input):
+	args = check(input.group(0))
+	if args:
+		fight_status, userid = args
+		if input.host.split('.')[0] in fightbot_list:
+			if fight_status == "start":
+				if input.group(3) not in external_fights:
+					external_fights.append(userid)
+			else:
+				if input.group(3) in external_fights:
+					external_fights.remove(userid)
+share.commands = ['share']
+share.priority['high']
 
 
 ############################
@@ -723,6 +743,12 @@ def set_new_realm(phenny, mod, realmid):
 	else:
 		phenny.say("Error. The input should be a realm ID.")
 
+# Share players in fights
+def share_player_info(phenny, userid, fight_status):
+	for fightbot in fightbot_list:
+		if not fightbot == phenny.nick:
+			phenny.write(('PRIVMSG', fightbot + ' !share ' + fight_status  + ' ' + userid))
+
 # End the fight
 def end_fight(phenny, userid):
 	if in_fight_quiet(userid):
@@ -766,6 +792,7 @@ def end_fight(phenny, userid):
 		phenny.say("==========================================")
 		current_realm.info(phenny)
 		del ongoing_fights[userid]
+		share_player_info(phenny, userid, "end")
 		# TODO: Add timer for 2 minute cooldown
 
 
