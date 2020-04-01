@@ -19,7 +19,6 @@ ongoing_fights = {} # holds the player and monster objects for ongoing fights.
 					# with Player under key 'player', and Monster under 'monster':  {userid: {'player': Player, 'monster': Monster, 'data': {}}}
 					# 'data' can hold miscellaneous data such as the round #
 external_fights = [] # Fights happening in other bots
-fightbot_list = ["FightBot", "FightBot2", "FightBot3", "FightBot4"] # All FightBots
 
 arguments = {'start': 0, 'setrealm': 1, 'openrealm': 0, 'unopenrealm': 0, 'realmlock': 0, 'realmunlock': 0, 'info': 0, 'fights': 0, 'explore': 0, 'stats': 0, 'run': 0, 'attack': 1, 'items': 0, 'item': 1, 'share': 2}
 help = OrderedDict([('start', "If adventuring has not already begun, use !start to get the bot going."),
@@ -376,7 +375,7 @@ def share(phenny, input):
 	args = check(input.group(0))
 	if args:
 		fight_status, userid = args
-		if input.host.split('.')[0] in fightbot_list:
+		if input.host.split('.')[0] in phenny.fightbot_list:
 			if fight_status == "start":
 				if input.group(3) not in external_fights:
 					external_fights.append(userid)
@@ -745,9 +744,8 @@ def set_new_realm(phenny, mod, realmid):
 
 # Share players in fights
 def share_player_info(phenny, userid, fight_status):
-	for fightbot in fightbot_list:
-		if not fightbot == phenny.nick:
-			phenny.write(('PRIVMSG', fightbot + ' !share ' + fight_status  + ' ' + userid))
+	for fightbot in phenny.fightbot_list:
+		phenny.write(('PRIVMSG', fightbot + ' !share ' + fight_status  + ' ' + userid))
 
 # End the fight
 def end_fight(phenny, userid):
