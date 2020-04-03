@@ -3,7 +3,7 @@ nick = 'FightBot'
 name = 'FightBot'
 host = '69.69.69.69'
 port = 6667
-fightbot_list = ['FightBot2', 'FightBot3', 'FightBot4']
+fightbot_list = ['fightbot2', 'fightbot3', 'fightbot4']
 
 # Reconnect delay
 delay = 120
