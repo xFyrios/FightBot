@@ -373,16 +373,14 @@ items.priority = 'medium'
 items.example = '!items'
 
 def share(phenny, input):
-	args = check_args(phenny, input.group(0))
-	if args:
-		fight_status, userid = args
-		if input.host.split('.')[0] in phenny.config.fightbot_list:
-			if fight_status == "start":
-				if userid not in external_fights:
-					external_fights.append(userid)
-			else:
-				if userid in external_fights:
-					external_fights.remove(userid)
+	if input.host.split('.')[0] in phenny.config.fightbot_list:
+		fight_status, userid = input.group(1), input.group(2)
+		if fight_status == "start":
+			if userid not in external_fights:
+				external_fights.append(userid)
+		else:
+			if userid in external_fights:
+				external_fights.remove(userid)
 share.commands = ['share']
 share.priority = 'high'
 
