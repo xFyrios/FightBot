@@ -5,6 +5,7 @@ from collections import OrderedDict
 from random import randint
 from math import floor
 from threading import Timer
+from time import sleep
 
 REALM_CYCLE = 60 * 60 * 6  # How often to cycle to a new realm (6 hours)
 REALM_CYCLE_RETRY = 60 * 60 # How long to wait before trying to cycle the realm again if callGazelleApi fails (1 hour)
@@ -181,7 +182,7 @@ def explore(phenny, input):
 		userid = input.uid
 		username = input.nick
 		share_player_info(phenny, userid, "start")
-		time.sleep(1)
+		sleep(1)
 		if userid in external_fights:
 			phenny.say("You can't keep exploring... you are already in a fight!")
 			return False
@@ -375,7 +376,7 @@ def share(phenny, input):
 	args = check_args(phenny, input.group(0))
 	if args:
 		fight_status, userid = args
-		if input.host.split('.')[0] in phenny.fightbot_list:
+		if input.host.split('.')[0] in phenny.config.fightbot_list:
 			if fight_status == "start":
 				if input.group(3) not in external_fights:
 					external_fights.append(userid)
@@ -744,7 +745,7 @@ def set_new_realm(phenny, sender, mod, realmid):
 
 # Share players in fights
 def share_player_info(phenny, userid, fight_status):
-	for fightbot in phenny.fightbot_list:
+	for fightbot in phenny.config.fightbot_list:
 		phenny.write(('PRIVMSG', fightbot + ' !share ' + fight_status  + ' ' + userid))
 
 # End the fight
