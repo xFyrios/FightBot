@@ -34,7 +34,7 @@ class Bot(asynchat.async_chat):
       self.user = nick
       self.name = name
       self.password = password
-	  self.advchan = advchan
+      self.advchan = advchan
 
       self.verbose = True
       self.channels = channels or []
