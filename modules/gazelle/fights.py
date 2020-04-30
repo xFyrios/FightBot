@@ -378,10 +378,10 @@ def share(phenny, input):
 		fight_status, userid = args
 		if input.host.split('.')[0] in phenny.config.fightbot_list:
 			if fight_status == "start":
-				if input.group(3) not in external_fights:
+				if userid not in external_fights:
 					external_fights.append(userid)
 			else:
-				if input.group(3) in external_fights:
+				if userid in external_fights:
 					external_fights.remove(userid)
 share.commands = ['share']
 share.priority = 'high'
