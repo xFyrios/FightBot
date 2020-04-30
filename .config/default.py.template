@@ -4,6 +4,7 @@ name = 'FightBot'
 host = '69.69.69.69'
 port = 6667
 fightbot_list = ['fightbot2', 'fightbot3', 'fightbot4']
+advchan = '#AdventureClub'  # TODO: deprecate this and use the channels config variable
 
 # Reconnect delay
 delay = 120
