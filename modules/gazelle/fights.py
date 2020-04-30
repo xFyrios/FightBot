@@ -383,7 +383,7 @@ def share(phenny, input):
 				if input.group(3) in external_fights:
 					external_fights.remove(userid)
 share.commands = ['share']
-share.priority['high']
+share.priority = 'high'
 
 
 ############################
