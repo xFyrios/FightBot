@@ -372,7 +372,7 @@ items.priority = 'medium'
 items.example = '!items'
 
 def share(phenny, input):
-	args = check(input.group(0))
+	args = check_args(phenny, input.group(0))
 	if args:
 		fight_status, userid = args
 		if input.host.split('.')[0] in phenny.fightbot_list:
