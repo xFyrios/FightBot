@@ -110,7 +110,7 @@ def set_realm(phenny, input):
 	args = check_args(phenny, input.group(0))
 	if args:
 		realmid = args[0]
-		set_new_realm(phenny, input.mod, realmid)
+		set_new_realm(phenny, input.sender, input.mod, realmid)
 set_realm.commands = ['setrealm']
 set_realm.priority = 'low'
 set_realm.example = '!realm 1'
@@ -713,7 +713,7 @@ def create_new_realm(phenny):
 	realm_switch_timer.start()
 
 # Let staff manually set a new realm or users if the realm is open
-def set_new_realm(phenny, mod, realmid):
+def set_new_realm(phenny, sender, mod, realmid):
 	global current_realm, game_started, realm_switch_timer
 	
 	if realmid.isdigit():
@@ -729,7 +729,7 @@ def set_new_realm(phenny, mod, realmid):
 				current_realm = False
 				current_realm = fight.realm.create(realmid, new_realm_info['Name'], new_realm_info['Level'], new_realm_info['HuntCost'], new_realm_info['Monsters'])
 				realm_name_info, realm_level_info = current_realm.announce(phenny)
-				if not input.sender.startswith('#'):
+				if not sender.startswith('#'):
 					phenny.say(realm_name_info)
 					phenny.say(realm_level_info)
 				realm_switch_timer.cancel()
